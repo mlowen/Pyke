@@ -1,4 +1,9 @@
+import sys
+
 from . import main
 
 if __name__ == '__main__':
-	main()
+	ret = main('build.py', 'default')
+	
+	if ret:
+		sys.ext(ret)
