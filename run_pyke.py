@@ -1,7 +1,9 @@
+#! /bin/env python
+
 import sys
 import os
 
-from . import run_build
+import pyke
 
 def main():
 	args = sys.argv[1:]
@@ -25,7 +27,7 @@ def main():
 	if build_file == None and default_build_file in os.listdir(cwd):
 		build_file = os.path.join(cwd, default_build_file) 
 		
-	ret = run_build(build_file, target)
+	ret = pyke.run_build(build_file, target)
 	
 	if ret:
 		sys.ext(ret)
