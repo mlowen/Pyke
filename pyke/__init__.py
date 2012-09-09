@@ -1,5 +1,5 @@
 import os.path
-import pyke.buildfile
+from . import buildfile
 
 class BuildConfig:
 	def __init__(self):
@@ -19,7 +19,10 @@ class BuildConfig:
 
 def create_default_config():
 	return None
-		
+
+def get_default_filename():
+	return 'build.pyke'
+	
 def run_build(filepath, target):
 	config = BuildConfig()
 	pre_build = None
