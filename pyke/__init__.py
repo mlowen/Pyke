@@ -3,7 +3,7 @@ class BuildConfig:
 		self.paths = []
 		self.build_system = ''
 	
-	def set_source_paths(paths):
+	def set_source_path(paths):
 		if isinstance(paths, list):
 			self.paths = [ p for p in paths if isinstance(p, str)]
 		elif isinstance(paths, str):
