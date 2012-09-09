@@ -10,7 +10,7 @@ def main():
 	argc = len(args)
 	
 	cwd = os.getcwd()
-	default_build_file = pyke.get_default_filename()
+	default_build_file = pyke.buildfile.get_default_filename()
 	build_file = None
 	target = None
 	

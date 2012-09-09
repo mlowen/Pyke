@@ -1,30 +1,11 @@
-import os.path
 from . import buildfile
-
-class BuildConfig:
-	def __init__(self):
-		self.paths = []
-		self.build_system = ''
-	
-	def set_source_path(paths):
-		if isinstance(paths, list):
-			self.paths = [ p for p in paths if isinstance(p, str)]
-		elif isinstance(paths, str):
-			self.paths = [ paths ]
-		else:
-			raise Exception('Invalid object passed to set_source_paths, expecting a string or an array')
-	
-	def set_build_system(builder):
-		self.build_system = builder
+from . import buildtarget
 
 def create_default_config():
 	return None
-
-def get_default_filename():
-	return 'build.pyke'
 	
 def run_build(filepath, target):
-	config = BuildConfig()
+	config = buildtarget.TargetConfig()
 	pre_build = None
 	post_build = None
 	
