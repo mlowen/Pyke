@@ -19,23 +19,23 @@ class BuildFileWrapper:
 		self.postbuild_pattern = 'post_%s'
 	
 	# Target	
-	def target_exists(target_name):
+	def target_exists(self, target_name):
 		return target_name in self.methods
 	
-	def run_target(target_name, config):
+	def run_target(self, target_name, config):
 		method = getattr(self.module, target_name)
 		
 		if method != None:
 			method(config)
 	
 	# Pre-build
-	def prebuild_exists(target_name):
+	def prebuild_exists(self, target_name):
 		if target_name == target.get_default_target():
 			return self.default_prebuild in self.methods
 		
 		return (self.prebuild_pattern % target_name) in self.methods
 	
-	def run_prebuild(target_name):
+	def run_prebuild(self, target_name):
 		method = None
 		
 		if target_name == target.get_default_target():
@@ -47,13 +47,13 @@ class BuildFileWrapper:
 			method()
 	
 	# Post-build
-	def postbuild_exists(target_name):
+	def postbuild_exists(self, target_name):
 		if target_name == target.get_default_target():
 			return self.default_postbuild in self.methods
 		
 		return (self.postbuild_pattern % target_name) in self.methods
 	
-	def run_postbuild(target_name):
+	def run_postbuild(self, target_name):
 		method = None
 		
 		if target_name == target.get_default_target():
