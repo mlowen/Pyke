@@ -2,7 +2,7 @@ import imp
 import os
 import inspect
 
-from . import buildtarget
+from . import target
 
 def get_default_filename():
 	return 'build.pyke'
@@ -19,47 +19,47 @@ class BuildFileWrapper:
 		self.postbuild_pattern = 'post_%s'
 	
 	# Target	
-	def target_exists(target):
-		return target in self.methods
+	def target_exists(target_name):
+		return target_name in self.methods
 	
-	def run_target(target, config):
-		method = getattr(self.module, target)
+	def run_target(target_name, config):
+		method = getattr(self.module, target_name)
 		
 		if method != None:
 			method(config)
 	
 	# Pre-build
-	def prebuild_exists(target):
-		if target == buildtarget.get_default_target():
+	def prebuild_exists(target_name):
+		if target_name == target.get_default_target():
 			return self.default_prebuild in self.methods
 		
-		return (self.prebuild_pattern % target) in self.methods
+		return (self.prebuild_pattern % target_name) in self.methods
 	
-	def run_prebuild(target):
+	def run_prebuild(target_name):
 		method = None
 		
-		if target == buildtarget.get_default_target():
+		if target_name == target.get_default_target():
 			method = getattr(self.module, self.default_prebuild)
 		else:
-			method = getattr(self.module, (self.prebuild_pattern % target))
+			method = getattr(self.module, (self.prebuild_pattern % target_name))
 		
 		if method != None:
 			method()
 	
 	# Post-build
-	def postbuild_exists(target):
-		if target == buildtarget.get_default_target():
+	def postbuild_exists(target_name):
+		if target_name == target.get_default_target():
 			return self.default_postbuild in self.methods
 		
-		return (self.postbuild_pattern % target) in self.methods
+		return (self.postbuild_pattern % target_name) in self.methods
 	
-	def run_postbuild(target):
+	def run_postbuild(target_name):
 		method = None
 		
-		if target == buildtarget.get_default_target():
+		if target_name == target.get_default_target():
 			method = getattr(self.module, self.default_postbuild)
 		else:
-			method = getattr(self.module, (self.postbuild_pattern % target))
+			method = getattr(self.module, (self.postbuild_pattern % target_name))
 		
 		if method != None:
 			method()

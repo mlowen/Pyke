@@ -26,7 +26,7 @@ def main():
 	
 	if build_file == None and default_build_file in os.listdir(cwd):
 		build_file = os.path.join(cwd, default_build_file) 
-		
+	
 	ret = pyke.run_build(build_file, target)
 	
 	if ret:

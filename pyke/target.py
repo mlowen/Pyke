@@ -1,7 +1,7 @@
 def get_default_target():
 	return 'default'
 
-class TargetConfig:
+class Config:
 	def __init__(self):
 		self.paths = []
 		self.build_system = ''
