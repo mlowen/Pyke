@@ -9,6 +9,7 @@ Pyke is a python build tool which is designed to be simple to use and configure,
 
 * File tracking.
 * Target Dependencies.
+* Expand to other compiliers.
 
 ## License
 Crapi is available under the MIT license which is as follows:
