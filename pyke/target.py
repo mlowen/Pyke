@@ -41,10 +41,12 @@ class Config:
 		return self.patterns
 			
 	def get_source_files(self):
-		# Parse out the files first
-		source_files = [ f for f in self.get_source_paths() if os.path.exists(f) and os.path.isfile(f) ]
+		paths = self.get_source_paths()
 		
-		for d in [ f for f in self.paths if os.path.exists(f) and os.path.isdir(f) ]:
+		# Parse out the files first
+		source_files = [ f for f in paths if os.path.exists(f) and os.path.isfile(f) ]
+		
+		for d in [ f for f in paths if os.path.exists(f) and os.path.isdir(f) ]:
 			source_files.extend(self.get_source_in_directory(d, self.get_source_patterns()))
 		
 		return source_files
@@ -75,4 +77,4 @@ class Config:
 		if self.output_name != None and isinstance(self.output_name, str):
 			return self.output_name
 		
-		return os.path.basename(os.path.dirname(os.getcwd()))
+		return os.path.basename(os.getcwd())
