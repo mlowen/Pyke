@@ -27,9 +27,10 @@ def run_build(filepath, target_name):
 	tmp_dir = mkdtemp()
 	
 	# Compile
-	output_files = [ compiler.compile_file(tmp_dir, f) for f in config.get_source_files() ]		
+	object_files = [ compiler.compile_file(tmp_dir, f) for f in config.get_source_files() ]		
 	
 	# Link
+	compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files)
 	
 	# Clean up
 	rmtree(tmp_dir)

@@ -8,6 +8,8 @@ class Config:
 	def __init__(self):
 		self.paths = []
 		self.patterns = []
+		self.output_path = None
+		self.output_name = None
 	
 	# Source Files
 	def set_source_path(self, paths):
@@ -43,3 +45,22 @@ class Config:
 			source_files.extend(self.get_source_in_directory(os.path.join(directory, sub_dir)))
 		
 		return source_files
+	
+	# Output
+	def set_output_path(self, path):
+		self.output_path = path
+	
+	def get_output_path(self):
+		if self.output_path != None and isinstance(self.output_path, str):
+			return self.output_path
+		
+		return os.getcwd()
+		
+	def set_output_name(self, name):
+		self.output_name = name
+	
+	def get_output_name(self):
+		if self.output_name != None and isinstance(self.output_name, str):
+			return self.output_name
+		
+		return os.path.basename(os.path.dirname(os.getcwd()))
