@@ -28,7 +28,7 @@ def main():
 	ret = run_build(build_file, target)
 	
 	if ret:
-		sys.ext(ret)
+		sys.exit(ret)
 
 if __name__ == '__main__':
 	main()

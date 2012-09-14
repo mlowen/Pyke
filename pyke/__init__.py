@@ -33,11 +33,16 @@ def run_build(filepath, target_name):
 	# Setup
 	tmp_dir = mkdtemp()
 	
-	# Compile
-	object_files = [ compiler.compile_file(tmp_dir, f) for f in config.get_source_files() ]		
+	try:
+		# Compile
+		object_files = [ compiler.compile_file(tmp_dir, f) for f in config.get_source_files() ]		
 	
-	# Link
-	compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files)
+		# Link
+		compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files)
+	except:
+		print('An error occurred while building your project, see above for details.')
+		return 1
+		
 	
 	# Clean up
 	rmtree(tmp_dir)

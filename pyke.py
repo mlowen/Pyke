@@ -30,7 +30,7 @@ def main():
 	ret = pyke.run_build(build_file, target)
 	
 	if ret:
-		sys.ext(ret)
+		sys.exit(ret)
 
 if __name__ == '__main__':
 	main()
