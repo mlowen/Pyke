@@ -4,21 +4,27 @@ from fnmatch import fnmatchcase
 def get_default_target():
 	return 'default'
 
+def set_list(items):
+	if isinstance(items, list):
+		return [ i for i in items if isinstance(i, str)]
+	elif isinstance(items, str):
+		return [ items ]
+	else:
+		raise Exception('Invalid argument, expecting a string or a list')
+	
 class Config:
 	def __init__(self):
 		self.paths = None
 		self.patterns = None
 		self.output_path = None
 		self.output_name = None
-	
+		self.compiler_flags = []
+		self.linker_flags = []
+		self.libraries = []
+		
 	# Source Files
 	def set_source_path(self, paths):
-		if isinstance(paths, list):
-			self.paths = [ p for p in paths if isinstance(p, str)]
-		elif isinstance(paths, str):
-			self.paths = [ paths ]
-		else:
-			raise Exception('Invalid argument, expecting a string or a list')
+		self.paths = set_list(paths)
 	
 	def get_source_paths(self):
 		if self.paths == None or len(self.paths) == 0:
@@ -27,12 +33,7 @@ class Config:
 		return self.paths
 			
 	def set_source_pattern(self, patterns):
-		if isinstance(patterns, list):
-			self.patterns = [ p for p in patterns if isinstance(p, str)]
-		elif isinstance(patterns, str):
-			self.patterns = [ patterns ]
-		else:
-			raise Exception('Invalid argument, expecting a string or a list')
+		self.patterns = set_list(patterns)
 	
 	def get_source_patterns(self):
 		if self.patterns == None or len(self.patterns) == 0:
@@ -55,8 +56,8 @@ class Config:
 		dir_items = os.listdir(directory)
 		source_files = [ os.path.join(directory, f) for f in dir_items if os.path.isfile(os.path.join(directory, f)) and True in [ fnmatchcase(f, p) for p in patterns ]]
 		
-		for sub_dir in [ d for d in dir_items if os.path.isdir(d) ]:
-			source_files.extend(self.get_source_in_directory(os.path.join(directory, sub_dir), patterns))
+		for sub_dir in [ os.path.join(directory, d) for d in dir_items if os.path.isdir(os.path.join(directory, d)) ]:
+			source_files.extend(self.get_source_in_directory(sub_dir, patterns))
 		
 		return source_files
 	
@@ -78,3 +79,12 @@ class Config:
 			return self.output_name
 		
 		return os.path.basename(os.getcwd())
+	
+	def set_compiler_flags(self, flags):
+		self.compiler_flags = set_list(flags)
+	
+	def set_linker_flags(self, flags):
+		self.linker_flags = set_list(flags)
+	
+	def set_libraries(self, libraries):
+		self.libraries = set_list(libraries)
