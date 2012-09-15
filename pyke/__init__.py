@@ -6,8 +6,22 @@ from . import buildfile
 from . import compiler
 from . import target
 
-def create_default_config():
-	return None
+def build_target(config):
+	# Setup
+	tmp_dir = mkdtemp()
+	
+	try:
+		# Compile
+		object_files = [ compiler.compile_file(tmp_dir, f, config.compiler_flags) for f in config.get_source_files() ]
+	
+		# Link
+		compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files, config.linker_flags, config.libraries)
+	except:
+		print('An error occurred while building your project, see above for details.')
+		return 1
+	
+	# Clean up
+	rmtree(tmp_dir)
 	
 def run_build(filepath, target_name):
 	config = None
@@ -30,18 +44,7 @@ def run_build(filepath, target_name):
 		config = target.Config()
 		build_file.run_target(target_name, config)
 	
-	# Setup
-	tmp_dir = mkdtemp()
+	ret = build_target(config)
 	
-	try:
-		# Compile
-		object_files = [ compiler.compile_file(tmp_dir, f, config.compiler_flags) for f in config.get_source_files() ]
-	
-		# Link
-		compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files, config.linker_flags, config.libraries)
-	except:
-		print('An error occurred while building your project, see above for details.')
-		return 1
-	
-	# Clean up
-	rmtree(tmp_dir)
+	if ret:
+		return ret
