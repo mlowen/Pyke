@@ -26,8 +26,14 @@ def build_config(config):
 def build_target(build_file, target_name, config):
 	print('Starting build: %s' % target_name)
 	
+	if build_file.prebuild_exists(target_name):
+		build_file.run_prebuild(target_name)
+	
 	if build_config(config):
 		return 1
+	
+	if build_file.postbuild_exists(target_name):
+		build_file.run_postbuild(target_name)
 	
 	print('Successfully built %s' % target_name)
 	
