@@ -6,7 +6,7 @@ from . import buildfile
 from . import compiler
 from . import target
 
-def build_target(config):
+def build_config(config):
 	# Setup
 	tmp_dir = mkdtemp()
 	
@@ -22,19 +22,28 @@ def build_target(config):
 	
 	# Clean up
 	rmtree(tmp_dir)
+
+def build_target(build_file, target_name, config):
+	print('Starting build: %s' % target_name)
+	
+	if build_config(config):
+		return 1
+	
+	print('Successfully built %s' % target_name)
 	
 def run_build(filepath, target_name):
 	config = None
 	build_file = None
 	
 	if filepath == None:
-		config = target.Config()	
+		if build_config(target.Config()):
+			return 1
 	else:
 		if not os.path.exists(filepath):
 			raise Exception('Unable to find build file: %s' % filepath)
 		
 		build_file = buildfile.load(filepath)
-	
+		
 		if target_name == None:
 			target_name = target.get_default_target()
 	
@@ -43,8 +52,6 @@ def run_build(filepath, target_name):
 		
 		config = target.Config()
 		build_file.run_target(target_name, config)
-	
-	ret = build_target(config)
-	
-	if ret:
-		return ret
+		
+		if build_target(build_file, target_name, config):
+			return 1
