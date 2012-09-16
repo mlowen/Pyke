@@ -1,9 +1,6 @@
 import os
 import json
 
-from shutil import rmtree
-from tempfile import mkdtemp
-
 from . import buildfile
 from . import compiler
 from . import target
@@ -21,13 +18,17 @@ class BuildRunner:
 		else:
 			self.pyke_file = {}
 	
-	def build_config(self, config, file_hashes):
+	def build_config(self, name, config):
 		# Setup
-		tmp_dir = mkdtemp()
+		obj_dir = os.path.join(self.pyke_path, name)
+		
+		hashes = {}
+		if name in self.pyke_file:
+			hashes = self.pyke_file[name]
 		
 		try:
 			# Compile
-			object_files = [ compiler.compile_file(tmp_dir, f, config.compiler_flags, file_hashes) for f in config.get_source_files() ]
+			object_files = [ compiler.compile_file(obj_dir, f, config.compiler_flags, hashes) for f in config.get_source_files() ]
 	
 			# Link
 			compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files, config.linker_flags, config.libraries)
@@ -35,8 +36,7 @@ class BuildRunner:
 			print('An error occurred while building your project, see above for details.')
 			return 1
 		
-		# Clean up
-		rmtree(tmp_dir)
+		self.pyke_file[name] = hashes
 	
 	def build_target(self, target_name):
 		print('Starting build: %s' % target_name)
@@ -50,11 +50,7 @@ class BuildRunner:
 		if self.build_file.prebuild_exists(target_name):
 			self.build_file.run_prebuild(target_name)
 		
-		file_hashes = {}
-		if target_name in self.pyke_file:
-			file_hashes = self.pyke_files[target_name]
-			
-		if self.build_config(config, file_hashes):
+		if self.build_config(target_name, config):
 			return 1
 		
 		if self.build_file.postbuild_exists(target_name):
@@ -64,7 +60,7 @@ class BuildRunner:
 	
 	def run(self, target_name):
 		if self.build_file == None:
-			if self.build_config(target.Config()):
+			if self.build_config(target.get_default_target(), target.Config()):
 				return 1
 		else:			
 			if target_name == None:
