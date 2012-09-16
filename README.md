@@ -1,15 +1,24 @@
 # Pyke
 Pyke is a python build tool which is designed to be simple to use and configure, which also allows you to use the full power of python in your build scripts.
 
+## Installation
+
+To install pyke you need to have a package that supplies easy\_install installed (personally I use [distribute](http://pypi.python.org/pypi/distribute/)).  Once you have easy\_install  and a copy of the source code you can install pyke by running the following command from the source:
+
+`python setup.py install`
+
 ## Usage
+
+`pyke [file] [target]`
+
+All arguments to pyke are optional, if there is no file supplied then pyke will attempt to load a `build.pyke` file in the current directory.  If there is no target supplied then the default target will be run.
 
 ## Pyke File
 
 ## To Do
 
-* File tracking.
 * Target Dependencies.
-* Expand to other compiliers.
+* Expand to other compilers.
 
 ## License
 Pyke is available under the MIT license which is as follows:
