@@ -1,6 +1,6 @@
 #! /bin/env python
 
-from pyke import runner
+import pyke
 
 if __name__ == '__main__':
-	runner.run()
+	pyke.main()

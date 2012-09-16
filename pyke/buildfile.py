@@ -2,7 +2,7 @@ import imp
 import os
 import inspect
 
-from . import target
+from pyke import target
 
 def get_default_filename():
 	return 'build.pyke'
