@@ -1,11 +1,10 @@
 import os
 import subprocess
 
+from hashlib import md5
 from platform import system
 
 def compile_file(output_base_path, file_name, flags, hashes):
-	print('Compiling %s' % file_name)
-	
 	parent_dir = os.path.dirname(file_name)
 	base_name = os.path.splitext(os.path.basename(file_name))[0]
 	output_path = os.path.join(output_base_path, parent_dir)
@@ -13,10 +12,18 @@ def compile_file(output_base_path, file_name, flags, hashes):
 	if not os.path.exists(output_path):
 		os.makedirs(output_path)
 	
+	# Create the file hash
+	file_hash = md5(open(file_name, 'rb').read()).hexdigest()
 	output_file = os.path.join(output_path, '%s.o' % base_name)
-	args = ['g++', '-c', file_name, '-o', output_file] + flags
+	
+	if file_name in hashes and hashes[file_name] == file_hash and os.path.exists(output_file):
+		print('%s has not changed, will not compile.' % file_name)
+	else:
+		print('Compiling %s' % file_name)
+		hashes[file_name] = file_hash
 		
-	subprocess.check_call(args, stderr=subprocess.STDOUT, shell = True)
+		args = ['g++', '-c', file_name, '-o', output_file] + flags
+		subprocess.check_call(args, stderr=subprocess.STDOUT, shell = True)
 	
 	return output_file
 
