@@ -1,2 +1,5 @@
 ._redcar
 __pycache__
+build
+dist
+pyke.egg-info
