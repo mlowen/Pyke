@@ -7,8 +7,9 @@ from . import compiler
 from . import target
 
 class BuildRunner:
-	def __init__(self, build_file):
+	def __init__(self, build_file, pyke_path):
 		self.build_file = build_file
+		self.pyke_path = pyke_path
 	
 	def build_config(self, config):
 		# Setup
@@ -47,7 +48,9 @@ class BuildRunner:
 		
 		print('Successfully built %s' % target_name)
 	
-	def run(self, target_name):	
+	def run(self, target_name):
+		# If it doesn't exist create the 
+		
 		if self.build_file == None:
 			if self.build_config(target.Config()):
 				return 1

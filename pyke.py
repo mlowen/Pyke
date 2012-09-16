@@ -11,6 +11,7 @@ def main():
 	
 	cwd = os.getcwd()
 	default_build_file = pyke.buildfile.get_default_filename()
+	pyke_path = os.path.join(cwd, '.pyke')
 	build_file_path = None
 	target = None
 	
@@ -21,7 +22,7 @@ def main():
 		else:
 			build_file_path = os.path.join(cwd, args[0])
 		
-		target = args [1]
+		target = args[1]
 	elif argc == 1:
 		target = args[0]
 	
@@ -30,8 +31,11 @@ def main():
 	
 	if not build_file_path == None:
 		build_file = pyke.buildfile.load(build_file_path)
-		
-	runner = pyke.BuildRunner(build_file)
+	
+	if not os.path.exists(pyke_path):
+		os.mkdir(pyke_path)
+	
+	runner = pyke.BuildRunner(build_file, pyke_path)
 	
 	ret = runner.run(target)
 	
