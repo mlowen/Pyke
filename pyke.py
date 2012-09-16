@@ -39,6 +39,8 @@ def main():
 	
 	ret = runner.run(target)
 	
+	runner.write_pyke_file()
+	
 	if ret:
 		sys.exit(ret)
 

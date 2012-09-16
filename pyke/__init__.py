@@ -1,4 +1,6 @@
 import os
+import json
+
 from shutil import rmtree
 from tempfile import mkdtemp
 
@@ -10,14 +12,22 @@ class BuildRunner:
 	def __init__(self, build_file, pyke_path):
 		self.build_file = build_file
 		self.pyke_path = pyke_path
+		self.pyke_file_path = os.path.join(self.pyke_path, 'pyke.json')
+		
+		if os.path.exists(self.pyke_file_path):
+			fp = open(self.pyke_file_path)
+			self.pyke_file = json.load(fp)
+			fp.close()
+		else:
+			self.pyke_file = {}
 	
-	def build_config(self, config):
+	def build_config(self, config, file_hashes):
 		# Setup
 		tmp_dir = mkdtemp()
 		
 		try:
 			# Compile
-			object_files = [ compiler.compile_file(tmp_dir, f, config.compiler_flags) for f in config.get_source_files() ]
+			object_files = [ compiler.compile_file(tmp_dir, f, config.compiler_flags, file_hashes) for f in config.get_source_files() ]
 	
 			# Link
 			compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files, config.linker_flags, config.libraries)
@@ -33,14 +43,18 @@ class BuildRunner:
 		
 		if not self.build_file.target_exists(target_name):
 			raise Exception('Target %s does not exist.' % target_name)
-		
+					
 		config = target.Config()
 		self.build_file.run_target(target_name, config)
 		
 		if self.build_file.prebuild_exists(target_name):
 			self.build_file.run_prebuild(target_name)
 		
-		if self.build_config(config):
+		file_hashes = {}
+		if target_name in self.pyke_file:
+			file_hashes = self.pyke_files[target_name]
+			
+		if self.build_config(config, file_hashes):
 			return 1
 		
 		if self.build_file.postbuild_exists(target_name):
@@ -49,8 +63,6 @@ class BuildRunner:
 		print('Successfully built %s' % target_name)
 	
 	def run(self, target_name):
-		# If it doesn't exist create the 
-		
 		if self.build_file == None:
 			if self.build_config(target.Config()):
 				return 1
@@ -60,3 +72,8 @@ class BuildRunner:
 			
 			if self.build_target(target_name):
 				return 1
+	
+	def write_pyke_file(self):
+		fp = open(self.pyke_file_path, 'w')
+		json.dump(self.pyke_file, fp)
+		fp.close()

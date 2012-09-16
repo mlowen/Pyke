@@ -3,7 +3,7 @@ import subprocess
 
 from platform import system
 
-def compile_file(output_base_path, file_name, flags):
+def compile_file(output_base_path, file_name, flags, hashes):
 	print('Compiling %s' % file_name)
 	
 	parent_dir = os.path.dirname(file_name)
