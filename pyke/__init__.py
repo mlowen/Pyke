@@ -28,11 +28,11 @@ class BuildRunner:
 		hashes = {}
 		if name in self.pyke_file:
 			hashes = self.pyke_file[name]
-		
+			
 		try:
 			# Compile
 			object_files = [ compiler.compile_file(obj_dir, f, config.get_compiler_flags(), hashes) for f in config.get_source_files() ]
-	
+		
 			# Link
 			compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files, config.get_linker_flags(), config.get_libraries())
 		except:

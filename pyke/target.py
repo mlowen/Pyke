@@ -14,8 +14,8 @@ class Config:
 	def get_list(self, key):
 		if key in self.data:
 			if isinstance(self.data[key], list):
-				return [ i for i in items if isinstance(i, str) ]
-			elif isinstance(self.data[key], str)
+				return [ i for i in self.data[key] if isinstance(i, str) ]
+			elif isinstance(self.data[key], str):
 				return [ self.data[key] ]
 		
 		return None
@@ -52,7 +52,7 @@ class Config:
 	def get_output_name(self):
 		key = 'output_name'
 		
-		return data[key] if key in self.data and isinstance(self.data[key], str) else os.path.basename(os.getcwd())
+		return self.data[key] if key in self.data and isinstance(self.data[key], str) else os.path.basename(os.getcwd())
 	
 	def get_compiler_flags(self):
 		flags = self.get_list('compiler_flags')
