@@ -31,10 +31,10 @@ class BuildRunner:
 		
 		try:
 			# Compile
-			object_files = [ compiler.compile_file(obj_dir, f, config.compiler_flags, hashes) for f in config.get_source_files() ]
+			object_files = [ compiler.compile_file(obj_dir, f, config.get_compiler_flags(), hashes) for f in config.get_source_files() ]
 	
 			# Link
-			compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files, config.linker_flags, config.libraries)
+			compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files, config.get_linker_flags(), config.get_libraries())
 		except:
 			print('An error occurred while building your project, see above for details.')
 			return 1
@@ -47,8 +47,7 @@ class BuildRunner:
 		if not self.build_file.target_exists(target_name):
 			raise Exception('Target %s does not exist.' % target_name)
 					
-		config = target.Config()
-		self.build_file.run_target(target_name, config)
+		config = self.build_file.run_target(target_name)
 		
 		if self.build_file.prebuild_exists(target_name):
 			self.build_file.run_prebuild(target_name)
