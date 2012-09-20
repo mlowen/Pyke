@@ -11,8 +11,8 @@ def set_list(items):
 		return [ items ]
 	else:
 		raise Exception('Invalid argument, expecting a string or a list')
-	
-class Config:
+
+class MethodConfig:
 	def __init__(self):
 		self.paths = None
 		self.patterns = None
