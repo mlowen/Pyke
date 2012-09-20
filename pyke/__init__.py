@@ -24,10 +24,7 @@ class BuildRunner:
 	def build_config(self, name, config):
 		# Setup
 		obj_dir = os.path.join(self.pyke_path, name)
-		
-		hashes = {}
-		if name in self.pyke_file:
-			hashes = self.pyke_file[name]
+		hashes = self.pyke_file[name] if name in self.pyke_file else {}
 		
 		# Compile
 		object_files = [ compiler.compile_file(obj_dir, f, config.get_compiler_flags(), hashes) for f in config.get_source_files() ]

@@ -17,6 +17,10 @@ All arguments to pyke are optional, if there is no file supplied then pyke will 
 
 ## To Do
 
+* 'Proper' argument parsing.
+* An alternative JSON based build file.
+* A built in 'clean' target to remove build artifacts.
+* A built in 'all' to build all targets in a pyke file.
 * Target Dependencies.
 * Expand to other compilers.
 
