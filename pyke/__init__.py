@@ -47,7 +47,7 @@ class BuildRunner:
 		if not self.build_file.target_exists(target_name):
 			raise Exception('Target %s does not exist.' % target_name)
 					
-		config = target.MethodConfig()
+		config = target.Config()
 		self.build_file.run_target(target_name, config)
 		
 		if self.build_file.prebuild_exists(target_name):
@@ -63,7 +63,7 @@ class BuildRunner:
 	
 	def run(self, target_name):
 		if self.build_file == None:
-			if self.build_config(target.get_default_target(), target.MethodConfig()):
+			if self.build_config(target.get_default_target(), target.Config()):
 				return 1
 		else:			
 			if target_name == None:
