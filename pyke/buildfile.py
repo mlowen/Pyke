@@ -22,11 +22,11 @@ class PythonFileWrapper:
 	def target_exists(self, target_name):
 		return target_name in self.methods
 	
-	def run_target(self, target_name, config):
+	def run_target(self, target_name):
 		method = getattr(self.module, target_name)
 		
 		if method != None:
-			method(config)
+			return target.Config(method())
 	
 	# Pre-build
 	def prebuild_exists(self, target_name):
