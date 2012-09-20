@@ -28,16 +28,12 @@ class BuildRunner:
 		hashes = {}
 		if name in self.pyke_file:
 			hashes = self.pyke_file[name]
-			
-		try:
-			# Compile
-			object_files = [ compiler.compile_file(obj_dir, f, config.get_compiler_flags(), hashes) for f in config.get_source_files() ]
 		
-			# Link
-			compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files, config.get_linker_flags(), config.get_libraries())
-		except:
-			print('An error occurred while building your project, see above for details.')
-			return 1
+		# Compile
+		object_files = [ compiler.compile_file(obj_dir, f, config.get_compiler_flags(), hashes) for f in config.get_source_files() ]
+		
+		# Link
+		compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files, config.get_linker_flags(), config.get_libraries())
 		
 		self.pyke_file[name] = hashes
 	
@@ -52,8 +48,7 @@ class BuildRunner:
 		if self.build_file.prebuild_exists(target_name):
 			self.build_file.run_prebuild(target_name)
 		
-		if self.build_config(target_name, config):
-			return 1
+		self.build_config(target_name, config)
 		
 		if self.build_file.postbuild_exists(target_name):
 			self.build_file.run_postbuild(target_name)
@@ -62,14 +57,12 @@ class BuildRunner:
 	
 	def run(self, target_name):
 		if self.build_file == None:
-			if self.build_config(target.get_default_target(), target.Config()):
-				return 1
+			self.build_config(target.get_default_target(), target.Config())
 		else:			
 			if target_name == None:
 				target_name = target.get_default_target()
 			
-			if self.build_target(target_name):
-				return 1
+			self.build_target(target_name)
 	
 	def write_pyke_file(self):
 		fp = open(self.pyke_file_path, 'w')
@@ -108,12 +101,17 @@ def main():
 		os.mkdir(pyke_path)
 	
 	runner = BuildRunner(build_file, pyke_path)
+	ret = None
 	
-	ret = runner.run(target)
+	try:
+		runner.run(target)
+	except:
+		print('An error occurred while building your project, see above for details.')
+		ret = 1		
 	
 	runner.write_pyke_file()
 	
-	if ret:
+	if not ret == None:
 		sys.exit(ret)
 
 if __name__ == '__main__':
