@@ -6,7 +6,7 @@ from pyke import buildfile
 from pyke import compiler
 from pyke import target
 
-__version__ = '0.1.0-alpha'
+__version__ = '0.1.1-alpha'
 
 class BuildRunner:
 	def __init__(self, build_file, pyke_path):
@@ -102,8 +102,9 @@ def main():
 	
 	try:
 		runner.run(target)
-	except:
+	except Exception as e:
 		print('An error occurred while building your project, see above for details.')
+		print(e)
 		ret = 1		
 	
 	runner.write_pyke_file()

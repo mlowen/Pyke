@@ -11,10 +11,7 @@ class PythonFileWrapper:
 	def __init__(self, module):
 		self.module = module
 		self.methods = [ i[0] for i in inspect.getmembers(self.module) if inspect.isfunction(i[1]) ]
-		
-		self.default_prebuild = 'prebuild'
-		self.default_postbuild = 'postbuild'
-		
+				
 		self.prebuild_pattern = 'pre_%s'
 		self.postbuild_pattern = 'post_%s'
 		
@@ -30,36 +27,20 @@ class PythonFileWrapper:
 	
 	# Pre-build
 	def prebuild_exists(self, target_name):
-		if target_name == target.get_default_target():
-			return self.default_prebuild in self.methods
-		
 		return (self.prebuild_pattern % target_name) in self.methods
 	
 	def run_prebuild(self, target_name):
-		method = None
-		
-		if target_name == target.get_default_target():
-			method = getattr(self.module, self.default_prebuild)
-		else:
-			method = getattr(self.module, (self.prebuild_pattern % target_name))
+		method = getattr(self.module, (self.prebuild_pattern % target_name))
 		
 		if method != None:
 			method()
 	
 	# Post-build
 	def postbuild_exists(self, target_name):
-		if target_name == target.get_default_target():
-			return self.default_postbuild in self.methods
-		
 		return (self.postbuild_pattern % target_name) in self.methods
 	
 	def run_postbuild(self, target_name):
-		method = None
-		
-		if target_name == target.get_default_target():
-			method = getattr(self.module, self.default_postbuild)
-		else:
-			method = getattr(self.module, (self.postbuild_pattern % target_name))
+		method = getattr(self.module, (self.postbuild_pattern % target_name))
 		
 		if method != None:
 			method()
