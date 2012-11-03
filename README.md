@@ -9,15 +9,17 @@ To install pyke you need to have a package that supplies easy\_install installed
 
 ## Usage
 
-`pyke [file] [target]`
+`pyke [-h] [-t, --target t] [-f, --file f]`
 
-All arguments to pyke are optional, if there is no file supplied then pyke will attempt to load a `build.pyke` file in the current directory.  If there is no target supplied then the default target will be run.
+### Optional Arguments:
+* `-h, --help` Show the help message and exit
+* `-t, --target t` Target to build, default target is 'default'
+* `-f, --file f` The build file to load, default file name is 'build.pyke'
 
 ## Pyke File
 
 ## To Do
 
-* 'Proper' argument parsing.
 * An alternative JSON based build file.
 * A built in 'clean' target to remove build artifacts.
 * A built in 'all' to build all targets in a pyke file.
