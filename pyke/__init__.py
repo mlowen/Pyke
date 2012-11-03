@@ -7,18 +7,19 @@ from pyke import buildfile
 from pyke import compiler
 from pyke import target
 
-__version__ = '0.2.0-alpha'
+__version__ = '0.2.1-alpha'
 
 class BuildRunner:
-	def __init__(self, build_file, pyke_path):
+	def __init__(self, build_file, base_path):
 		self.build_file = build_file
-		self.pyke_path = pyke_path
+		self.pyke_path = os.path.join(base_path, '.pyke')
 		self.pyke_file_path = os.path.join(self.pyke_path, 'pyke.json')
 		
+		if not os.path.exists(self.pyke_path):
+			os.mkdir(self.pyke_path)
+		
 		if os.path.exists(self.pyke_file_path):
-			fp = open(self.pyke_file_path)
-			self.pyke_file = json.load(fp)
-			fp.close()
+			self.pyke_file = json.load(open(self.pyke_file_path))
 		else:
 			self.pyke_file = {}
 	
@@ -26,6 +27,8 @@ class BuildRunner:
 		# Setup
 		obj_dir = os.path.join(self.pyke_path, name)
 		hashes = self.pyke_file[name] if name in self.pyke_file else {}
+		
+		print(config.get_source_files())
 		
 		# Compile
 		object_files = [ compiler.compile_file(obj_dir, f, config.get_compiler_flags(), hashes) for f in config.get_source_files() ]
@@ -79,20 +82,18 @@ def main():
 		help = 'The build file to load, default file name is \'%s\'' % buildfile.get_default_filename())
 	
 	args = parser.parse_args()
-	
-	cwd = os.getcwd()
-	pyke_path = os.path.join(cwd, '.pyke')
 	build_file_path = None
 	
 	if os.path.isabs(args.build_file):
 		build_file_path = args.build_file
 	else:
-		build_file_path = os.path.join(cwd, args.build_file)
+		build_file_path = os.path.join(os.getcwd(), args.build_file)
 	
-	if not os.path.exists(pyke_path):
-		os.mkdir(pyke_path)
+	base_path = os.path.dirname(build_file_path) 	
 	
-	runner = BuildRunner(buildfile.load(build_file_path), pyke_path)
+	os.chdir(base_path)
+	
+	runner = BuildRunner(buildfile.load(build_file_path), base_path)
 	ret = None
 	
 	try:
@@ -100,12 +101,12 @@ def main():
 	except Exception as e:
 		print('An error occurred while building your project, see above for details.')
 		print(e)
-		ret = 1		
+		ret = 1
 	
 	runner.write_pyke_file()
 	
 	if not ret == None:
 		sys.exit(ret)
-
+	
 if __name__ == '__main__':
 	main()
