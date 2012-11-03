@@ -7,7 +7,14 @@ from pyke import buildfile
 from pyke import compiler
 from pyke import target
 
+# Meta Information
 __version__ = '0.2.1-alpha'
+__name__ = 'Pyke'
+__description__ = 'Pyke is a build system for the gcc c++ compiler.'
+__author__ = 'Mike Lowen'
+__author_email__ = 'mike@mlowen.com'
+__homepage__ = 'http://mlowen.com'
+__license__ = 'MIT'
 
 class BuildRunner:
 	def __init__(self, build_file, base_path):
@@ -27,8 +34,6 @@ class BuildRunner:
 		# Setup
 		obj_dir = os.path.join(self.pyke_path, name)
 		hashes = self.pyke_file[name] if name in self.pyke_file else {}
-		
-		print(config.get_source_files())
 		
 		# Compile
 		object_files = [ compiler.compile_file(obj_dir, f, config.get_compiler_flags(), hashes) for f in config.get_source_files() ]
@@ -70,6 +75,11 @@ class BuildRunner:
 		json.dump(self.pyke_file, fp)
 		fp.close()
 
+def version():
+	print('%s %s' % (__name__, __version__))
+	print('Copyright (C) 2012 %s' % __author__)
+	print('Available for use under the %s license.' % __license__)
+	
 def main():
 	parser = argparse.ArgumentParser(description = 'A C++ build tool.')
 	
@@ -81,32 +91,39 @@ def main():
 		metavar = 'f', type = str, default = buildfile.get_default_filename(),
 		help = 'The build file to load, default file name is \'%s\'' % buildfile.get_default_filename())
 	
+	parser.add_argument('-v, --version', dest = 'display_version',
+		action = 'store_true', help = 'Displays version information')
+		
 	args = parser.parse_args()
-	build_file_path = None
 	
-	if os.path.isabs(args.build_file):
-		build_file_path = args.build_file
+	if args.display_version:
+		version()
 	else:
-		build_file_path = os.path.join(os.getcwd(), args.build_file)
-	
-	base_path = os.path.dirname(build_file_path) 	
-	
-	os.chdir(base_path)
-	
-	runner = BuildRunner(buildfile.load(build_file_path), base_path)
-	ret = None
-	
-	try:
-		runner.run(args.target)
-	except Exception as e:
-		print('An error occurred while building your project, see above for details.')
-		print(e)
-		ret = 1
-	
-	runner.write_pyke_file()
-	
-	if not ret == None:
-		sys.exit(ret)
-	
+		build_file_path = None
+		
+		if os.path.isabs(args.build_file):
+			build_file_path = args.build_file
+		else:
+			build_file_path = os.path.join(os.getcwd(), args.build_file)
+		
+		base_path = os.path.dirname(build_file_path) 	
+		
+		os.chdir(base_path)
+		
+		runner = BuildRunner(buildfile.load(build_file_path), base_path)
+		ret = None
+		
+		try:
+			runner.run(args.target)
+		except Exception as e:
+			print('An error occurred while building your project, see above for details.')
+			print(e)
+			ret = 1
+		
+		runner.write_pyke_file()
+		
+		if not ret == None:
+			sys.exit(ret)
+
 if __name__ == '__main__':
 	main()
