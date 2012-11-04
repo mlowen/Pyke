@@ -58,35 +58,40 @@ class BuildRunner:
 			
 			print('Successfully built %s' % target_name)
 	
-	def clean(self, target_name):
-		print('Starting clean: %s' % target_name)
-		
-		if not self.build_file.target_exists(target_name):
-			raise Exception('Target %s does not exist.' % target_name)
-			
-		if target_name in self.pyke_file:
-			del self.pyke_file[target_name]
-			
-		obj_dir = os.path.join(self.pyke_path, target_name)
-		
-		if(os.path.exists(obj_dir)):
-			shutil.rmtree(obj_dir)
-		
-		config = self.build_file.run_target(target_name)
-		output_path = config.get_output_path()
-		
-		if os.path.exists(output_path) and not os.getcwd() == output_path:
-			shutil.rmtree(output_path)
+	def clean(self, targets):
+		if isinstance(targets, list):
+			for t in targets:
+				self.clean(t)
 		else:
-			output_name = config.get_output_name()
+			target_name = targets
+			print('Starting clean: %s' % target_name)
 			
-			if system().lower() == 'windows':
-				output_name = '%s.exe' % output_name
+			if not self.build_file.target_exists(target_name):
+				raise Exception('Target %s does not exist.' % target_name)
+				
+			if target_name in self.pyke_file:
+				del self.pyke_file[target_name]
+				
+			obj_dir = os.path.join(self.pyke_path, target_name)
 			
-			if os.path.exists(output_name):
-				os.remove(output_name)
+			if(os.path.exists(obj_dir)):
+				shutil.rmtree(obj_dir)
 			
-		print('Successfully cleaned %s' % target_name)
+			config = self.build_file.run_target(target_name)
+			output_path = config.get_output_path()
+			
+			if os.path.exists(output_path) and not os.getcwd() == output_path:
+				shutil.rmtree(output_path)
+			else:
+				output_name = config.get_output_name()
+				
+				if system().lower() == 'windows':
+					output_name = '%s.exe' % output_name
+				
+				if os.path.exists(output_name):
+					os.remove(output_name)
+					
+			print('Successfully cleaned %s' % target_name)
 		
 	def write_pyke_file(self):
 		fp = open(self.pyke_file_path, 'w')
