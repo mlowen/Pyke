@@ -27,7 +27,7 @@ class PythonFileWrapper:
 			return target.Config(method())
 	
 	def get_all_targets(self):
-		return [ m for m in self.methods if not (m.startswith(self.prebuild_prefix) or m.startswith(self.postbuild_prefix)) ]
+		return [ m for m in self.methods if not (m.startswith(self.prebuild_prefix) or m.startswith(self.postbuild_prefix) or m.startswith(self.clean_prefix)) ]
 	
 	# Pre-build
 	def prebuild_name(self, target_name):
