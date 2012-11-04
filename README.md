@@ -9,7 +9,7 @@ To install pyke you need to have a package that supplies easy\_install installed
 
 ## Usage
 
-`pyke [-h] [-t target] [-f file] [-v] [-l]`
+`pyke [-h] [-t target] [-f file] [-v] [-l] [-c]`
 
 ### Optional Arguments:
 * `-h, --help` show this help message and exit
@@ -17,6 +17,7 @@ To install pyke you need to have a package that supplies easy\_install installed
 * `-f file, --file file` The build file to load, default file name is 'build.pyke'
 * `-v, --version` Displays version information.
 * `-l, --list` Lists all of the available targets in the build file.
+* `-c, --clean` Remove all build artifacts generated when the target is built.
 
 ## Pyke File
 A pyke build file for all intents and purposes is a python script, anything you can do in a python script can be done in a pyke script.  A build (including pre & post build methods) are run from the directory that the build file is located in which will be referred to as the base path in this section.
