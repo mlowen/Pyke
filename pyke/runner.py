@@ -19,39 +19,44 @@ class BuildRunner:
 			self.pyke_file = json.load(open(self.pyke_file_path))
 		else:
 			self.pyke_file = {}
+		
+	def build(self, targets):
+		if isinstance(targets, list):
+			for t in targets:
+				self.build(t)
+		else:
+			target_name = targets
+			print('Starting build: %s' % target_name)
 			
-	def build(self, target_name):
-		print('Starting build: %s' % target_name)
-		
-		if not self.build_file.target_exists(target_name):
-			raise Exception('Target %s does not exist.' % target_name)
-					
-		config = self.build_file.run_target(target_name)
-		
-		if self.build_file.prebuild_exists(target_name):
-			self.build_file.run_prebuild(target_name)
-		
-		# Setup
-		obj_dir = os.path.join(self.pyke_path, target_name)
-		hashes = self.pyke_file[target_name] if target_name in self.pyke_file else {}
-		
-		# Compile
-		object_files = [ compiler.compile_file(obj_dir, f, config.get_compiler_flags(), hashes) for f in config.get_source_files() ]
-		
-		# Link
-		output_name = config.get_output_name()
-		
-		if system().lower() == 'windows':
-			output_name = '%s.exe' % output_name
-		
-		compiler.link_executable(config.get_output_path(), output_name, object_files, config.get_linker_flags(), config.get_libraries())
-		
-		self.pyke_file[target_name] = hashes
-		
-		if self.build_file.postbuild_exists(target_name):
-			self.build_file.run_postbuild(target_name)
-		
-		print('Successfully built %s' % target_name)
+			if not self.build_file.target_exists(target_name):
+				raise Exception('Target %s does not exist.' % target_name)
+						
+			config = self.build_file.run_target(target_name)
+			
+			if self.build_file.prebuild_exists(target_name):
+				self.build_file.run_prebuild(target_name)
+			
+			# Setup
+			obj_dir = os.path.join(self.pyke_path, target_name)
+			hashes = self.pyke_file[target_name] if target_name in self.pyke_file else {}
+			
+			# Compile
+			object_files = [ compiler.compile_file(obj_dir, f, config.get_compiler_flags(), hashes) for f in config.get_source_files() ]
+			
+			# Link
+			output_name = config.get_output_name()
+			
+			if system().lower() == 'windows':
+				output_name = '%s.exe' % output_name
+			
+			compiler.link_executable(config.get_output_path(), output_name, object_files, config.get_linker_flags(), config.get_libraries())
+			
+			self.pyke_file[target_name] = hashes
+			
+			if self.build_file.postbuild_exists(target_name):
+				self.build_file.run_postbuild(target_name)
+			
+			print('Successfully built %s' % target_name)
 	
 	def clean(self, target_name):
 		print('Starting clean: %s' % target_name)

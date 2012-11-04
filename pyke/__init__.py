@@ -22,9 +22,10 @@ def version():
 def main():
 	parser = argparse.ArgumentParser(description = 'A C++ build tool.')
 	
-	parser.add_argument('-t', '--target', dest = 'target', 
-		metavar = 'target', type = str, default = target.get_default_target(), 
-		help = 'Target to build, default target is \'%s\'' % target.get_default_target())
+	# Command line arguments
+	parser.add_argument('-t', '--target', dest = 'targets', 
+		metavar = 'target', nargs = '+', type = str, default = target.get_default_target(), 
+		help = 'Targets to build, default target is \'%s\'' % target.get_default_target())
 	
 	parser.add_argument('-f', '--file', dest = 'build_file',
 		metavar = 'file', type = str, default = buildfile.get_default_filename(),
@@ -37,10 +38,11 @@ def main():
 		action = 'store_true', help = 'Lists all of the available targets in the build file.')
 	
 	parser.add_argument('-c', '--clean', dest = 'clean_target',
-		action = 'store_true', help = 'Remove all build artifacts generated when the target.')
-	
+		action = 'store_true', help = 'Remove all build artifacts generated when the target is built.')
+			
 	args = parser.parse_args()
 	
+	# Run the application
 	if args.display_version:
 		version()
 	else:
@@ -66,9 +68,9 @@ def main():
 			
 			try:
 				if args.clean_target:
-					build_runner.clean(args.target)
+					build_runner.clean(args.targets)
 				else:
-					build_runner.build(args.target)
+					build_runner.build(args.targets)
 			except Exception as e:
 				print('An error occurred while building your project, see above for details.')
 				print(e)

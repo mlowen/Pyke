@@ -9,11 +9,11 @@ To install pyke you need to have a package that supplies easy\_install installed
 
 ## Usage
 
-`pyke [-h] [-t target] [-f file] [-v] [-l] [-c]`
+`pyke [-h] [-t target [target ...]] [-f file] [-v] [-l] [-c]`
 
 ### Optional Arguments:
 * `-h, --help` show this help message and exit
-* `-t target, --target target` Target to build, default target is 'default'
+* `-t target [target ...], --target target [target ...]` Targets to build, default target is 'default'
 * `-f file, --file file` The build file to load, default file name is 'build.pyke'
 * `-v, --version` Displays version information.
 * `-l, --list` Lists all of the available targets in the build file.
