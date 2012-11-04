@@ -11,24 +11,23 @@ class Config:
 		else:
 			self.data = data
 	
-	def get_list(self, key):
+	def get_list(self, key, default):
 		if key in self.data:
 			if isinstance(self.data[key], list):
 				return [ i for i in self.data[key] if isinstance(i, str) ]
 			elif isinstance(self.data[key], str):
 				return [ self.data[key] ]
 		
-		return None
+		return default
+	
+	def get_string(self, key, default):
+		return self.data[key] if key in self.data and isinstance(self.data[key], str) else default
 		
 	def get_source_paths(self):
-		paths = self.get_list('source_paths')
-		
-		return [ os.path.relpath(os.getcwd()) ] if paths == None else paths
+		return self.get_list('source_paths', None)
 	
 	def get_source_patterns(self):
-		patterns = self.get_list('source_patterns')
-		
-		return [ '*.cc', '*.cpp', '*.cxx' ] if patterns == None else patterns
+		 return self.get_list('source_patterns', [ '*.cc', '*.cpp', '*.cxx' ])
 	
 	def get_source_files(self, paths = None, patterns = None):
 		if patterns == None:
@@ -45,26 +44,25 @@ class Config:
 		return files
 	
 	def get_output_path(self):
-		key = 'output_path'
-		
-		return self.data[key] if key in self.data and isinstance(self.data[key], str) else os.getcwd()
+		return self.get_string('output_path', os.getcwd())
 		
 	def get_output_name(self):
-		key = 'output_name'
-		
-		return self.data[key] if key in self.data and isinstance(self.data[key], str) else os.path.basename(os.getcwd())
+		return self.get_string('output_name', os.path.basename(os.getcwd()))
 	
 	def get_compiler_flags(self):
-		flags = self.get_list('compiler_flags')
-		
-		return [] if flags == None else flags
+		return self.get_list('compiler_flags', [])
 	
 	def get_linker_flags(self):
-		flags = self.get_list('linker_flags')
-		
-		return [] if flags == None else flags
+		return self.get_list('linker_flags', [])
 	
 	def get_libraries(self):
-		libraries = self.get_list('libraries')
+		return self.get_list('libraries', [])
+	
+	def get_prebuild(self):
+		return self.get_string('prebuild')
 		
-		return [] if libraries == None else libraries
+	def get_postbuild(self):
+		return self.get_string('postbuild')
+	
+	def get_clean(self):
+		return self.get_string('clean')
