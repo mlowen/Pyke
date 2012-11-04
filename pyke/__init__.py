@@ -32,6 +32,9 @@ def main():
 	
 	parser.add_argument('-v', '--version', dest = 'display_version',
 		action = 'store_true', help = 'Displays version information')
+	
+	parser.add_argument('-l', '--list', dest = 'list_targets',
+		action = 'store_true', help = 'Lists all of the available targets in the build file.')
 		
 	args = parser.parse_args()
 	
@@ -45,24 +48,30 @@ def main():
 		else:
 			build_file_path = os.path.join(os.getcwd(), args.build_file)
 		
-		base_path = os.path.dirname(build_file_path) 	
+		build_file = buildfile.load(build_file_path)
 		
-		os.chdir(base_path)
+		if args.list_targets:
+			for t in build_file.get_all_targets():
+				print(t)
+		else:
+			base_path = os.path.dirname(build_file_path) 	
+			
+			os.chdir(base_path)
+			
+			build_runner = runner.BuildRunner(build_file, base_path)
+			ret = None
+			
+			try:
+				build_runner.build(args.target)
+			except Exception as e:
+				print('An error occurred while building your project, see above for details.')
+				print(e)
+				ret = 1
+			
+			build_runner.write_pyke_file()
 		
-		build_runner = runner.BuildRunner(buildfile.load(build_file_path), base_path)
-		ret = None
-		
-		try:
-			build_runner.build(args.target)
-		except Exception as e:
-			print('An error occurred while building your project, see above for details.')
-			print(e)
-			ret = 1
-		
-		build_runner.write_pyke_file()
-		
-		if not ret == None:
-			sys.exit(ret)
+			if not ret == None:
+				sys.exit(ret)
 
 if __name__ == '__main__':
 	main()
