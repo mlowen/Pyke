@@ -14,6 +14,7 @@ class PythonFileWrapper:
 		
 		self.prebuild_prefix = 'pre_'
 		self.postbuild_prefix = 'post_'
+		self.clean_prefix = 'clean_'
 		
 	# Target	
 	def target_exists(self, target_name):
@@ -47,6 +48,16 @@ class PythonFileWrapper:
 	
 	def run_postbuild(self, target_name):
 		self.run_method(self.postbuild_name(target_name))
+	
+	# Clean
+	def clean_name(self, target):
+		return "%s%s" % (self.clean_prefix, target)
+	
+	def clean_exists(self, target):
+		return self.method_exists(self.clean_name(target))
+	
+	def run_clean(self, target):
+		self.run_method(self.clean_name(target))
 	
 	# Utility Functions
 	def method_exists(self, method_name):

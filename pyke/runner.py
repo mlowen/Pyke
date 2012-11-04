@@ -71,7 +71,8 @@ class BuildRunner:
 			
 			if not self.build_file.target_exists(target_name):
 				raise Exception('Target %s does not exist.' % target_name)
-				
+			
+			# Delete pyke generated files
 			if target_name in self.pyke_file:
 				del self.pyke_file[target_name]
 				
@@ -81,19 +82,24 @@ class BuildRunner:
 				shutil.rmtree(obj_dir)
 			
 			config = self.build_file.run_target(target_name)
-			output_path = config.get_output_path()
 			
-			if os.path.exists(output_path) and not os.getcwd() == output_path:
-				shutil.rmtree(output_path)
+			# Check if the user has a custom clean available.
+			if self.build_file.clean_exists(target_name):
+				self.build_file.run_clean(target_name)
 			else:
-				output_name = config.get_output_name()
+				output_path = config.get_output_path()
 				
-				if system().lower() == 'windows':
-					output_name = '%s.exe' % output_name
-				
-				if os.path.exists(output_name):
-					os.remove(output_name)
+				if os.path.exists(output_path) and not os.getcwd() == output_path:
+					shutil.rmtree(output_path)
+				else:
+					output_name = config.get_output_name()
 					
+					if system().lower() == 'windows':
+						output_name = '%s.exe' % output_name
+					
+					if os.path.exists(output_name):
+						os.remove(output_name)
+						
 			print('Successfully cleaned %s' % target_name)
 	
 	def clean_all(self):
