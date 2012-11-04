@@ -2,7 +2,6 @@ import os
 import subprocess
 
 from hashlib import md5
-from platform import system
 
 def compile_file(output_base_path, file_name, flags, hashes):
 	parent_dir = os.path.dirname(file_name)
@@ -28,9 +27,6 @@ def compile_file(output_base_path, file_name, flags, hashes):
 	return output_file
 
 def link_executable(output_path, file_name, object_files, flags, libraries):
-	if system().lower() == 'windows':
-		file_name = '%s.exe' % file_name
-	
 	if not os.path.exists(output_path):
 		os.makedirs(output_path)
 	

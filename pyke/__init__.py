@@ -35,7 +35,10 @@ def main():
 	
 	parser.add_argument('-l', '--list', dest = 'list_targets',
 		action = 'store_true', help = 'Lists all of the available targets in the build file.')
-		
+	
+	parser.add_argument('-c', '--clean', dest = 'clean_target',
+		action = 'store_true', help = 'Remove all build artifacts generated when the target.')
+	
 	args = parser.parse_args()
 	
 	if args.display_version:
@@ -62,7 +65,10 @@ def main():
 			ret = None
 			
 			try:
-				build_runner.build(args.target)
+				if args.clean_target:
+					build_runner.clean(args.target)
+				else:
+					build_runner.build(args.target)
 			except Exception as e:
 				print('An error occurred while building your project, see above for details.')
 				print(e)
