@@ -30,20 +30,7 @@ class BuildRunner:
 		else:
 			self.pyke_file = {}
 	
-	def build_config(self, name, config):
-		# Setup
-		obj_dir = os.path.join(self.pyke_path, name)
-		hashes = self.pyke_file[name] if name in self.pyke_file else {}
-		
-		# Compile
-		object_files = [ compiler.compile_file(obj_dir, f, config.get_compiler_flags(), hashes) for f in config.get_source_files() ]
-		
-		# Link
-		compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files, config.get_linker_flags(), config.get_libraries())
-		
-		self.pyke_file[name] = hashes
-	
-	def build_target(self, target_name):
+	def build(self, target_name):
 		print('Starting build: %s' % target_name)
 		
 		if not self.build_file.target_exists(target_name):
@@ -54,22 +41,23 @@ class BuildRunner:
 		if self.build_file.prebuild_exists(target_name):
 			self.build_file.run_prebuild(target_name)
 		
-		self.build_config(target_name, config)
+		# Setup
+		obj_dir = os.path.join(self.pyke_path, target_name)
+		hashes = self.pyke_file[target_name] if target_name in self.pyke_file else {}
+		
+		# Compile
+		object_files = [ compiler.compile_file(obj_dir, f, config.get_compiler_flags(), hashes) for f in config.get_source_files() ]
+		
+		# Link
+		compiler.link_executable(config.get_output_path(), config.get_output_name(), object_files, config.get_linker_flags(), config.get_libraries())
+		
+		self.pyke_file[target_name] = hashes
 		
 		if self.build_file.postbuild_exists(target_name):
 			self.build_file.run_postbuild(target_name)
 		
 		print('Successfully built %s' % target_name)
-	
-	def run(self, target_name):
-		if self.build_file == None:
-			self.build_config(target.get_default_target(), target.Config())
-		else:			
-			if target_name == None:
-				target_name = target.get_default_target()
-			
-			self.build_target(target_name)
-	
+		
 	def write_pyke_file(self):
 		fp = open(self.pyke_file_path, 'w')
 		json.dump(self.pyke_file, fp)
@@ -114,7 +102,7 @@ def main():
 		ret = None
 		
 		try:
-			runner.run(args.target)
+			runner.build(args.target)
 		except Exception as e:
 			print('An error occurred while building your project, see above for details.')
 			print(e)
