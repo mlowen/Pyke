@@ -59,10 +59,10 @@ class Config:
 		return self.get_list('libraries', [])
 	
 	def get_prebuild(self):
-		return self.get_string('prebuild')
+		return self.get_string('prebuild', None)
 		
 	def get_postbuild(self):
-		return self.get_string('postbuild')
+		return self.get_string('postbuild', None)
 	
 	def get_clean(self):
-		return self.get_string('clean')
+		return self.get_string('clean', None)

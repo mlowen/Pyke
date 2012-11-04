@@ -33,7 +33,11 @@ class BuildRunner:
 			
 			config = self.build_file.run_target(target_name)
 			
-			if self.build_file.prebuild_exists(target_name):
+			custom_prebuild = config.get_prebuild()
+			
+			if not custom_prebuild == None and self.build_file.method_exists(custom_prebuild):
+				self.build_file.run_method(custom_prebuild)
+			elif self.build_file.prebuild_exists(target_name):
 				self.build_file.run_prebuild(target_name)
 			
 			# Setup
@@ -53,7 +57,11 @@ class BuildRunner:
 			
 			self.pyke_file[target_name] = hashes
 			
-			if self.build_file.postbuild_exists(target_name):
+			custom_postbuild = config.get_postbuild()
+			
+			if not custom_postbuild == None and self.build_file.method_exists(custom_postbuild):
+				self.build_file.run_method(custom_postbuild)
+			elif self.build_file.postbuild_exists(target_name):
 				self.build_file.run_postbuild(target_name)
 			
 			print('Successfully built %s' % target_name)
@@ -72,7 +80,7 @@ class BuildRunner:
 			if not self.build_file.target_exists(target_name):
 				raise Exception('Target %s does not exist.' % target_name)
 			
-			# Delete pyke generated files
+			# Delete pyke generated  intermediate files
 			if target_name in self.pyke_file:
 				del self.pyke_file[target_name]
 				
@@ -83,7 +91,7 @@ class BuildRunner:
 			
 			config = self.build_file.run_target(target_name)
 			
-			# Check if the user has a custom clean available.
+			# Check if the build file has a custom clean available.
 			if self.build_file.clean_exists(target_name):
 				self.build_file.run_clean(target_name)
 			else:
