@@ -30,7 +30,7 @@ class BuildRunner:
 			
 			if not self.build_file.target_exists(target_name):
 				raise Exception('Target %s does not exist.' % target_name)
-						
+			
 			config = self.build_file.run_target(target_name)
 			
 			if self.build_file.prebuild_exists(target_name):
@@ -58,6 +58,9 @@ class BuildRunner:
 			
 			print('Successfully built %s' % target_name)
 	
+	def build_all(self):
+		self.build(self.build_file.get_all_targets())
+			
 	def clean(self, targets):
 		if isinstance(targets, list):
 			for t in targets:
@@ -92,7 +95,10 @@ class BuildRunner:
 					os.remove(output_name)
 					
 			print('Successfully cleaned %s' % target_name)
-		
+	
+	def clean_all(self):
+		self.clean(self.build_file.get_all_targets())
+	
 	def write_pyke_file(self):
 		fp = open(self.pyke_file_path, 'w')
 		json.dump(self.pyke_file, fp)

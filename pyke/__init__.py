@@ -6,7 +6,7 @@ from pyke import runner
 from pyke import buildfile
 
 # Meta Information
-__version__ = '0.2.2-alpha'
+__version__ = '0.2.3-alpha'
 __name__ = 'Pyke'
 __description__ = 'Pyke is a build system for the gcc c++ compiler.'
 __author__ = 'Mike Lowen'
@@ -39,7 +39,10 @@ def main():
 	
 	parser.add_argument('-c', '--clean', dest = 'clean_target',
 		action = 'store_true', help = 'Remove all build artifacts generated when the target is built.')
-			
+	
+	parser.add_argument('-a', '--all', dest = 'all_targets',
+		action = 'store_true', help = 'Run build/clean against all targets in the build file.')
+	
 	args = parser.parse_args()
 	
 	# Run the application
@@ -68,9 +71,15 @@ def main():
 			
 			try:
 				if args.clean_target:
-					build_runner.clean(args.targets)
+					if args.all_targets:
+						build_runner.clean_all()
+					else:
+						build_runner.clean(args.targets)
 				else:
-					build_runner.build(args.targets)
+					if args.all_targets:
+						build_runner.build_all()
+					else:
+						build_runner.build(args.targets)
 			except Exception as e:
 				print('An error occurred while building your project, see above for details.')
 				print(e)
