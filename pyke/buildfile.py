@@ -11,13 +11,13 @@ class PythonFileWrapper:
 	def __init__(self, module):
 		self.module = module
 		self.methods = [ i[0] for i in inspect.getmembers(self.module) if inspect.isfunction(i[1]) ]
-				
-		self.prebuild_pattern = 'pre_%s'
-		self.postbuild_pattern = 'post_%s'
+		
+		self.prebuild_prefix = 'pre_'
+		self.postbuild_prefix = 'post_'
 		
 	# Target	
 	def target_exists(self, target_name):
-		return target_name in self.methods
+		return self.method_exists(target_name)
 	
 	def run_target(self, target_name):
 		method = getattr(self.module, target_name)
@@ -26,25 +26,34 @@ class PythonFileWrapper:
 			return target.Config(method())
 	
 	# Pre-build
+	def prebuild_name(self, target_name):
+		return '%s%s' % (self.prebuild_prefix, target_name)
+	
 	def prebuild_exists(self, target_name):
-		return (self.prebuild_pattern % target_name) in self.methods
+		return self.method_exists(self.prebuild_name(target_name))
 	
 	def run_prebuild(self, target_name):
-		method = getattr(self.module, (self.prebuild_pattern % target_name))
-		
-		if method != None:
-			method()
+		self.run_method(prebuild_name(target_name))
 	
 	# Post-build
+	def postbuild_name(self, target_name):
+		return '%s%s' % (self.postbuild_prefix, target_name)
+	
 	def postbuild_exists(self, target_name):
-		return (self.postbuild_pattern % target_name) in self.methods
+		return self.method_exists(self.postbuild_name(target_name))
 	
 	def run_postbuild(self, target_name):
-		method = getattr(self.module, (self.postbuild_pattern % target_name))
+		self.run_method(self.postbuild_name(target_name))
+	
+	# Utility Functions
+	def method_exists(self, method_name):
+		return method_name in self.methods
+	
+	def run_method(self, method_name):
+		method = getattr(self.module, method_name)
 		
 		if method != None:
-			method()
-	
+			return method()
 
 def load(filepath):
 	if not os.path.exists(filepath):
