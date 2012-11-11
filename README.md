@@ -76,9 +76,9 @@ def default():
 		'output_path': 'bin',
 		'output_name': 'example_name',
 		'source_path': [ 'src' ],
-		'source_patterns': [ '*.cc', '*.cpp' ]
-		'compiler_flags': [ '-WALL', '-I', '..\\libs\\include' ]
-		'linker_flags': [ 'L', '..\\libs' ]
+		'source_patterns': [ '*.cc', '*.cpp' ],
+		'compiler_flags': [ '-WALL', '-I', '..\\libs\\include' ],
+		'linker_flags': [ 'L', '..\\libs' ],
 		'libraries': [ 'example-lib-a', 'example-lib-b' ]
 	}
 
@@ -93,9 +93,9 @@ The closest equivalent JSON build file would be:
 	"output_path": "bin",
 	"output_name": "example_name",
 	"source_path": [ "src" ],
-	"source_patterns": [ "*.cc", "*.cpp" ]
-	"compiler_flags": [ "-WALL", "-I", "..\\libs\\include" ]
-	"linker_flags": [ "L", "..\\libs" ]
+	"source_patterns": [ "*.cc", "*.cpp" ],
+	"compiler_flags": [ "-WALL", "-I", "..\\libs\\include" ],
+	"linker_flags": [ "L", "..\\libs" ],
 	"libraries": [ "example-lib-a", "example-lib-b" ]
 }
 ```
