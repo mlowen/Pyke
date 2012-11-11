@@ -43,6 +43,9 @@ def main():
 	parser.add_argument('-a', '--all', dest = 'all_targets',
 		action = 'store_true', help = 'Run build/clean against all targets in the build file.')
 	
+	parser.add_argument('-j', '--json', dest = 'build_json', action = 'store_true', 
+		help = 'Force the file to load as json, when no file is specified then the default file name will be \'%s\'' % buildfile.get_default_json_filename())
+	
 	args = parser.parse_args()
 	
 	# Run the application
@@ -54,7 +57,10 @@ def main():
 		if os.path.isabs(args.build_file):
 			build_file_path = args.build_file
 		else:
-			build_file_path = os.path.join(os.getcwd(), args.build_file)
+			if args.build_json and args.build_file == buildfile.get_default_filename():
+				build_file_path = os.path.join(os.getcwd(), buildfile.get_default_json_filename())
+			else:
+				build_file_path = os.path.join(os.getcwd(), args.build_file)
 		
 		build_file = buildfile.load(build_file_path)
 		
