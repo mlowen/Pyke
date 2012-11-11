@@ -85,11 +85,13 @@ def post_default():
 
 ## To Do
 
+The following is the list of features that are to be incorporated into Pyke and the approximate order in which they will be done.
+
 * An alternative JSON based build file.
-* A built in 'clean' target to remove build artifacts.
-* A built in 'all' to build all targets in a pyke file.
+* Building libraries.
+* File dependencies 
 * Target Dependencies.
-* Expand to other compilers.
+* Expand to other compilers - as a starting point C, Java and possibly C#.
 
 ## License
 Pyke is available under the MIT license which is as follows:
