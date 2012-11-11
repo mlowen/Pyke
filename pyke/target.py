@@ -49,6 +49,9 @@ class Config:
 	def get_output_name(self):
 		return self.get_string('output_name', os.path.basename(os.getcwd()))
 	
+	def get_output_type(self):
+		return self.get_string('output_type', 'executable').strip().lower()
+	
 	def get_compiler_flags(self):
 		return self.get_list('compiler_flags', [])
 	

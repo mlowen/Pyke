@@ -37,3 +37,27 @@ def link_executable(output_path, file_name, object_files, flags, libraries):
 	args = ['g++', '-o', executable_path] + object_files + flags + [ '-l%s' %l for l in libraries ]
 	
 	subprocess.check_call(args, stderr=subprocess.STDOUT, shell = True)
+
+def link_static_library(output_path, file_name, object_files, libraries):
+	if not os.path.exists(output_path):
+		os.makedirs(output_path)
+	
+	executable_path = os.path.join(output_path, file_name)
+	
+	print('Linking %s' % executable_path)
+	
+	args = ['ar', 'crf', executable_path ] + object_files + flags
+	
+	subprocess.check_call(args, stderr = subprocess.STDOUT, shell = True)
+
+def link_dynamic_library(output_path, file_name, object_files, flags, libraries)
+	if not os.path.exists(output_path):
+		os.makedirs(output_path)
+	
+	executable_path = os.path.join(output_path, file_name)
+	
+	print('Linking %s' % executable_path)
+	
+	args = [ 'g++', '-shared', '-o', executable_path ] + object_files + flags + [ '-l%s' %l for l in libraries ]
+	
+	subprocess.check_call(args, stderr = subprocess.STDOUT, shell = True)
