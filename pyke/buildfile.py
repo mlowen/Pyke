@@ -29,6 +29,38 @@ class FileWrapperBase:
 	def clean_name(self, target):
 		return "%s%s" % (self.clean_prefix, target)
 
+class JsonFileWrapper(FileWrapperBase):
+	def __init__(self, data):
+		FileWrapperBase.__init__(self)
+		
+		self.data = data
+	
+	# Target
+	def target_exists(self, target_name):
+		return target_name in self.data
+	
+	def run_target(self, target_name):
+		return target.Config(self.data[target_name])
+	
+	def get_all_targets(self):
+		return self.data.keys()
+	
+	# Pre-build
+	def prebuild_exists(self, target_name):
+		return False
+	
+	# Post-build
+	def postbuild_exists(self, target_name):
+		return False
+	
+	# Clean
+	def clean_exists(self, target):
+		return False
+		
+	# Utility Functions
+	def method_exists(self, method_name):
+		return False
+
 class PythonFileWrapper(FileWrapperBase):
 	def __init__(self, module):
 		FileWrapperBase.__init__(self)
@@ -93,6 +125,8 @@ def load(filepath):
 		module = imp.load_module(os.path.basename(filename), fp, filepath, (extension, 'r', imp.PY_SOURCE))
 		
 		build_file = PythonFileWrapper(module)
+	elif extension == '.json':
+		build_file = JsonFileWrapper(json.load(fp))
 	
 	fp.close()
 	
