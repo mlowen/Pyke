@@ -50,7 +50,7 @@ def link_static_library(output_path, file_name, object_files, libraries):
 	
 	subprocess.check_call(args, stderr = subprocess.STDOUT, shell = True)
 
-def link_dynamic_library(output_path, file_name, object_files, flags, libraries)
+def link_dynamic_library(output_path, file_name, object_files, flags, libraries):
 	if not os.path.exists(output_path):
 		os.makedirs(output_path)
 	
