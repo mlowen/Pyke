@@ -2,7 +2,7 @@ import os
 import sys
 import argparse
 
-from pyke import runner
+from pyke import runners
 from pyke import buildfile
 
 # Meta Information
@@ -46,6 +46,9 @@ def main():
 	parser.add_argument('-j', '--json', dest = 'build_json', action = 'store_true', 
 		help = 'Force the file to load as json, when no file is specified then the default file name will be \'%s\'' % buildfile.get_default_json_filename())
 	
+	parser.add_argument('-d', '--dependencies', dest = 'generate_dependencies', action = 'store_true',
+		help = '')
+	
 	args = parser.parse_args()
 	
 	# Run the application
@@ -72,7 +75,7 @@ def main():
 			
 			os.chdir(base_path)
 			
-			build_runner = runner.BuildRunner(build_file, base_path)
+			build_runner = runners.BuildRunner(build_file, base_path)
 			ret = None
 			
 			try:
@@ -81,6 +84,8 @@ def main():
 						build_runner.clean_all()
 					else:
 						build_runner.clean(args.targets)
+				if args.generate_dependencies:
+					print('Dependencies need to be generated.')
 				else:
 					if args.all_targets:
 						build_runner.build_all()
