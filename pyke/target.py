@@ -1,9 +1,6 @@
 import os
 from fnmatch import fnmatchcase
 
-def get_default_target():
-	return 'default'
-
 class Config:
 	def __init__(self, data = None):
 		if data == None:

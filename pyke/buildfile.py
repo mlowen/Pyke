@@ -5,12 +5,6 @@ import json
 
 from pyke import target
 
-def get_default_filename():
-	return 'build.pyke'
-
-def get_default_json_filename():
-	return 'build.json'
-
 class FileWrapperBase:
 	def __init__(self):
 		self.prebuild_prefix = 'pre_'

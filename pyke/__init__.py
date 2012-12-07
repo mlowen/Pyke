@@ -2,6 +2,7 @@ import os
 import sys
 import argparse
 
+from pyke import defaults
 from pyke import runners
 from pyke import buildfile
 
@@ -24,12 +25,12 @@ def main():
 	
 	# Command line arguments
 	parser.add_argument('-t', '--target', dest = 'targets', 
-		metavar = 'target', nargs = '+', type = str, default = target.get_default_target(), 
-		help = 'Targets to build, default target is \'%s\'' % target.get_default_target())
+		metavar = 'target', nargs = '+', type = str, default = defaults.get_target(), 
+		help = 'Targets to build, default target is \'%s\'' % defaults.get_target())
 	
 	parser.add_argument('-f', '--file', dest = 'build_file',
-		metavar = 'file', type = str, default = buildfile.get_default_filename(),
-		help = 'The build file to load, default file name is \'%s\'' % buildfile.get_default_filename())
+		metavar = 'file', type = str, default = defaults.get_filename(),
+		help = 'The build file to load, default file name is \'%s\'' % defaults.get_filename())
 	
 	parser.add_argument('-v', '--version', dest = 'display_version',
 		action = 'store_true', help = 'Displays version information')
@@ -44,7 +45,7 @@ def main():
 		action = 'store_true', help = 'Run build/clean against all targets in the build file.')
 	
 	parser.add_argument('-j', '--json', dest = 'build_json', action = 'store_true', 
-		help = 'Force the file to load as json, when no file is specified then the default file name will be \'%s\'' % buildfile.get_default_json_filename())
+		help = 'Force the file to load as json, when no file is specified then the default file name will be \'%s\'' % defaults.get_json_filename())
 	
 	parser.add_argument('-d', '--dependencies', dest = 'generate_dependencies', action = 'store_true',
 		help = '')
@@ -60,8 +61,8 @@ def main():
 		if os.path.isabs(args.build_file):
 			build_file_path = args.build_file
 		else:
-			if args.build_json and args.build_file == buildfile.get_default_filename():
-				build_file_path = os.path.join(os.getcwd(), buildfile.get_default_json_filename())
+			if args.build_json and args.build_file == defaults.get_filename():
+				build_file_path = os.path.join(os.getcwd(), defaults.get_json_filename())
 			else:
 				build_file_path = os.path.join(os.getcwd(), args.build_file)
 		
