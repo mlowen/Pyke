@@ -22,7 +22,7 @@ def version():
 	
 def main():
 	parser = argparse.ArgumentParser(description = 'A C++ build tool.')
-	
+		
 	# Command line arguments
 	parser.add_argument('-t', '--target', dest = 'targets', 
 		metavar = 'target', nargs = '+', type = str, default = defaults.get_target(), 
@@ -35,20 +35,20 @@ def main():
 	parser.add_argument('-v', '--version', dest = 'display_version',
 		action = 'store_true', help = 'Displays version information')
 	
-	parser.add_argument('-l', '--list', dest = 'list_targets',
-		action = 'store_true', help = 'Lists all of the available targets in the build file.')
+	parser.add_argument('-l', '--list', dest = 'list_targets', action = 'store_true', 
+		help = 'Lists all of the available targets in the build file.')
 	
-	parser.add_argument('-c', '--clean', dest = 'clean_target',
-		action = 'store_true', help = 'Remove all build artifacts generated when the target is built.')
+	parser.add_argument('-c', '--clean', dest = 'action', action = 'store_const', 
+		const = 'clean', help = 'Remove all build artifacts generated when the target is built.')
 	
-	parser.add_argument('-a', '--all', dest = 'all_targets',
+	parser.add_argument('-a', '--all', dest = 'action',
 		action = 'store_true', help = 'Run build/clean against all targets in the build file.')
 	
 	parser.add_argument('-j', '--json', dest = 'build_json', action = 'store_true', 
 		help = 'Force the file to load as json, when no file is specified then the default file name will be \'%s\'' % defaults.get_json_filename())
 	
-	parser.add_argument('-d', '--dependencies', dest = 'generate_dependencies', action = 'store_true',
-		help = '')
+	parser.add_argument('-d', '--dependencies', dest = 'action', action = 'store_const', const = 'dependencies',
+		help = 'Generate and store the dependencies for the source files in the target.')
 	
 	args = parser.parse_args()
 	
@@ -80,12 +80,12 @@ def main():
 			ret = None
 			
 			try:
-				if args.clean_target:
+				if args.action == 'clean':
 					if args.all_targets:
 						build_runner.clean_all()
 					else:
 						build_runner.clean(args.targets)
-				if args.generate_dependencies:
+				if args.action == 'dependencies':
 					print('Dependencies need to be generated.')
 				else:
 					if args.all_targets:
