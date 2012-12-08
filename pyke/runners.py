@@ -125,7 +125,7 @@ class CleanRunner(BaseRunner):
 				shutil.rmtree(obj_dir)
 			
 			config = self.build_file.run_target(target_name)
-			compiler = compilers.factory('g++', config.get_output_type())
+			compiler = compilers.factory(config.get_compiler(), config.get_output_type())
 			custom_clean = config.get_clean()
 			
 			# Check if the build file has a custom clean available.
