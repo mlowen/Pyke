@@ -79,23 +79,23 @@ def main():
 			build_runner = runners.BuildRunner(build_file, base_path)
 			ret = None
 			
-			#try:
-			if args.action == 'clean':
-				if args.all_targets:
-					build_runner.clean_all()
+			try:
+				if args.action == 'clean':
+					if args.all_targets:
+						build_runner.clean_all()
+					else:
+						build_runner.clean(args.targets)
+				elif args.action == 'dependencies':
+					print('Dependencies need to be generated.')
 				else:
-					build_runner.clean(args.targets)
-			if args.action == 'dependencies':
-				print('Dependencies need to be generated.')
-			else:
-				if args.all_targets:
-					build_runner.build_all()
-				else:
-					build_runner.build(args.targets)
-			#except Exception as e:
-			#	print('An error occurred while building your project, see above for details.')
-			#	print(e)
-			#	ret = 1
+					if args.all_targets:
+						build_runner.build_all()
+					else:
+						build_runner.build(args.targets)
+			except Exception as e:
+				print('An error occurred while building your project, see above for details.')
+				print(e)
+				ret = 1
 			
 			build_runner.write_pyke_file()
 		

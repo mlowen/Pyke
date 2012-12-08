@@ -58,21 +58,13 @@ class BuildRunner(BaseRunner):
 			
 			# Link
 			output_type = config.get_output_type()
-			output_name = config.get_output_name()			
+			output_name = compiler.get_output_name(config.get_output_name(), output_type)			
 			
 			if output_type == 'executable':
-				if system().lower() == 'windows':
-					output_name = '%s.exe' % output_name
-	
 				compiler.link_executable(config.get_output_path(), output_name, object_files, config.get_linker_flags(), config.get_libraries())
 			elif output_type == 'sharedlib':
-				compiler.link_static_library(config.get_output_path(), '%.a' % output_name, object_files, config.get_linker_flags(), config.get_libraries())
+				compiler.link_static_library(config.get_output_path(), output_name, object_files, config.get_linker_flags(), config.get_libraries())
 			elif output_type == 'dynamiclib':
-				if system().lower() == 'windows':
-					output_name = '%s.dll' % output_name
-				else:
-					output_name = '%s.so' % output_name
-				
 				compiler.link_dynamic_library(config.get_output_path(), output_name, object_files, config.get_linker_flags(), config.get_libraries())
 			else:
 				raise Exception('Unknown output type: %s' % output_type)
@@ -126,19 +118,7 @@ class BuildRunner(BaseRunner):
 					shutil.rmtree(output_path)
 				else:
 					output_type = config.get_output_type()
-					output_name = config.get_output_name()
-					
-					if output_type == 'executable' and system().lower() == 'windows':
-						output_name = '%s.exe' % output_name
-					elif output_type == 'sharedlib':
-						output_name = '%s.a'
-					elif output_type == 'dynamiclib':
-						if system().lower() == 'windows':
-							output_name = '%s.dll' % output_name
-						else:
-							output_name = '%s.so' % output_name
-					elif not output_type == 'executable':
-						raise Exception('Unknown output type: %s' % output_type)
+					output_name = compiler.get_output_name(config.get_output_name(), output_type)
 					
 					if os.path.exists(output_name):
 						os.remove(output_name)

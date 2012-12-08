@@ -2,6 +2,22 @@ import os
 import subprocess
 
 from hashlib import md5
+from platform import system
+
+def get_output_name(base_name, output_type):
+	if output_type == 'executable' and system().lower() == 'windows':
+		return '%s.exe' % base_name
+	elif output_type == 'sharedlib':
+		return'%s.a' % base_name
+	elif output_type == 'dynamiclib':
+		if system().lower() == 'windows':
+			return '%s.dll' % base_name
+		else:
+			return '%s.so' % base_name
+	elif not output_type == 'executable':
+		raise Exception('Unknown output type: %s' % output_type)
+					
+	return base_name
 
 def compile_file(output_base_path, file_name, flags, hashes):
 	parent_dir = os.path.dirname(file_name)
