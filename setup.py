@@ -9,18 +9,19 @@ setup(
 	description = pyke.__description__,
 	long_description = pyke.__description__,
 	classifiers = [
-		'Development Status :: 3 - Alpha',
+		'Development Status :: 4 - Beta',
 		'Intended Audience :: Developers',
 		'License :: OSI Approved :: MIT License',
 		'Topic :: Software Development :: Build Tools',
 		'Environment :: Console',
-		'Programming Language :: Python :: 3.2'
+		'Programming Language :: C++',
+		'Programming Language :: Python :: 3'
 	],
 	author = pyke.__author__,
 	author_email = pyke.__author_email__,
 	url = pyke.__homepage__,
 	license = pyke.__license__,
-	packages = [ 'pyke' ],
+	packages = [ 'pyke', 'pyke.compilers' ],
 	entry_points = { 'console_scripts': [ 'pyke = pyke:main' ]},
 	zip_safe = False
 )

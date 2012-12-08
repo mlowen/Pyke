@@ -7,7 +7,7 @@ from pyke import runners
 from pyke import buildfile
 
 # Meta Information
-__version__ = '0.3.6-alpha'
+__version__ = '0.3.6-beta'
 __name__ = 'Pyke'
 __description__ = 'Pyke is a build system for the gcc c++ compiler.'
 __author__ = 'Mike Lowen'
