@@ -7,7 +7,7 @@ from pyke import runners
 from pyke import buildfile
 
 # Meta Information
-__version__ = '0.2.4-alpha'
+__version__ = '0.3.6-alpha'
 __name__ = 'Pyke'
 __description__ = 'Pyke is a build system for the gcc c++ compiler.'
 __author__ = 'Mike Lowen'
@@ -76,28 +76,20 @@ def main():
 			
 			os.chdir(base_path)
 			
-			build_runner = runners.BuildRunner(build_file, base_path)
+			runner = runners.factory(args.action, build_file, base_path)
 			ret = None
 			
 			try:
-				if args.action == 'clean':
-					if args.all_targets:
-						build_runner.clean_all()
-					else:
-						build_runner.clean(args.targets)
-				elif args.action == 'dependencies':
-					print('Dependencies need to be generated.')
+				if args.all_targets:
+					runner.run_all()
 				else:
-					if args.all_targets:
-						build_runner.build_all()
-					else:
-						build_runner.build(args.targets)
+					runner.run(args.targets)
 			except Exception as e:
 				print('An error occurred while building your project, see above for details.')
 				print(e)
 				ret = 1
 			
-			build_runner.write_pyke_file()
+			runner.write_pyke_file()
 		
 			if not ret == None:
 				sys.exit(ret)

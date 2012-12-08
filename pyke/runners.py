@@ -6,6 +6,12 @@ from platform import system
 from pyke import compiler
 from pyke import target
 
+def factory(action, build_file, base_path):
+	if action == 'clean':
+		return CleanRunner(build_file, base_path)
+	
+	return BuildRunner(build_file, base_path)
+
 class BaseRunner:
 	def __init__(self, build_file, base_path):
 		self.build_file = build_file
@@ -29,7 +35,7 @@ class BuildRunner(BaseRunner):
 	def __init__(self, build_file, base_path):
 		BaseRunner.__init__(self, build_file, base_path)
 		
-	def build(self, targets):
+	def run(self, targets):
 		if isinstance(targets, list):
 			for t in targets:
 				self.build(t)
@@ -80,10 +86,14 @@ class BuildRunner(BaseRunner):
 			
 			print('Successfully built %s' % target_name)
 	
-	def build_all(self):
+	def run_all(self):
 		self.build(self.build_file.get_all_targets())
-			
-	def clean(self, targets):
+
+class CleanRunner(BaseRunner):
+	def __init__(self, build_file, base_path):
+		BaseRunner.__init__(self, build_file, base_path)
+	
+	def run(self, targets):
 		if isinstance(targets, list):
 			for t in targets:
 				self.clean(t)
@@ -125,5 +135,5 @@ class BuildRunner(BaseRunner):
 						
 			print('Successfully cleaned %s' % target_name)
 	
-	def clean_all(self):
+	def run_all(self):
 		self.clean(self.build_file.get_all_targets())
