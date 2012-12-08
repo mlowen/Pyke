@@ -42,14 +42,7 @@ class ExecutableCompiler(BaseCompiler):
         
         return base_name
     
-    def link(self, output_path, file_name, object_files, flags):
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
-        
-        executable_path = os.path.join(output_path, file_name)
-        
-        print('Linking %s' % executable_path)
-        
+    def link(self, executable_path, object_files, flags):
         args = ['g++', '-o', executable_path] + object_files + flags
         
         subprocess.check_call(args, stderr=subprocess.STDOUT, shell = True)
@@ -58,14 +51,7 @@ class StaticLibraryCompiler(BaseCompiler):
     def get_output_name(self, base_name):
         return'%s.a' % base_name
     
-    def link(self, output_path, file_name, object_files, flags):
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
-        
-        executable_path = os.path.join(output_path, file_name)
-        
-        print('Linking %s' % executable_path)
-        
+    def link(self, executable_path, object_files, flags):
         args = ['ar', 'crf', executable_path ] + object_files + flags
         
         subprocess.check_call(args, stderr = subprocess.STDOUT, shell = True)
@@ -77,14 +63,7 @@ class DynamicLibraryCompiler(BaseCompiler):
         else:
             return '%s.so' % base_name
     
-    def link(self, output_path, file_name, object_files, flags):
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
-        
-        executable_path = os.path.join(output_path, file_name)
-        
-        print('Linking %s' % executable_path)
-        
+    def link(self, executable_path, object_files, flags):
         args = [ 'g++', '-shared', '-o', executable_path ] + object_files + flags
         
         subprocess.check_call(args, stderr = subprocess.STDOUT, shell = True)

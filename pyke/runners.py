@@ -92,8 +92,15 @@ class BuildRunner(BaseRunner):
 			object_files.append(object_file)
 		
 		# Link
-		output_name = compiler.get_output_name(config.get_output_name())			
-		compiler.link(config.get_output_path(), output_name, object_files, config.get_linker_flags())
+		output_name = compiler.get_output_name(config.get_output_name())
+		output_path = config.get_output_path()
+		
+		print('Linking %s' % output_name)
+		
+		if not os.path.exists(output_path):
+			os.makedirs(output_path)
+					
+		compiler.link(os.path.join(output_path, output_name), object_files, config.get_linker_flags())
 		
 		custom_postbuild = config.get_postbuild()
 		
