@@ -3,7 +3,7 @@ import json
 import shutil
 
 from platform import system
-from pyke import compiler
+from pyke import compilers
 from pyke import target
 
 def factory(action, build_file, base_path):
@@ -47,6 +47,7 @@ class BuildRunner(BaseRunner):
 				raise Exception('Target %s does not exist.' % target_name)
 			
 			config = self.build_file.run_target(target_name)
+			compiler = compilers.factory('g++', config.get_output_type())
 			
 			custom_prebuild = config.get_prebuild()
 			
@@ -60,20 +61,11 @@ class BuildRunner(BaseRunner):
 			hashes = self.pyke_file[target_name] if target_name in self.pyke_file else {}
 			
 			# Compile
-			object_files = [ compiler.compile_file(obj_dir, f, config.get_compiler_flags(), hashes) for f in config.get_source_files() ]
+			object_files = compiler.compile(obj_dir, config.get_source_files(), config.get_compiler_flags(), hashes)
 			
 			# Link
-			output_type = config.get_output_type()
-			output_name = compiler.get_output_name(config.get_output_name(), output_type)			
-			
-			if output_type == 'executable':
-				compiler.link_executable(config.get_output_path(), output_name, object_files, config.get_linker_flags())
-			elif output_type == 'sharedlib':
-				compiler.link_static_library(config.get_output_path(), output_name, object_files, config.get_linker_flags())
-			elif output_type == 'dynamiclib':
-				compiler.link_dynamic_library(config.get_output_path(), output_name, object_files, config.get_linker_flags())
-			else:
-				raise Exception('Unknown output type: %s' % output_type)
+			output_name = compiler.get_output_name(config.get_output_name())			
+			compiler.link(config.get_output_path(), output_name, object_files, config.get_linker_flags())
 			
 			self.pyke_file[target_name] = hashes
 			
@@ -114,6 +106,7 @@ class CleanRunner(BaseRunner):
 				shutil.rmtree(obj_dir)
 			
 			config = self.build_file.run_target(target_name)
+			compiler = compilers.factory('g++', config.get_output_type())
 			custom_clean = config.get_clean()
 			
 			# Check if the build file has a custom clean available.
@@ -128,7 +121,7 @@ class CleanRunner(BaseRunner):
 					shutil.rmtree(output_path)
 				else:
 					output_type = config.get_output_type()
-					output_name = compiler.get_output_name(config.get_output_name(), output_type)
+					output_name = compiler.get_output_name(config.get_output_name())
 					
 					if os.path.exists(output_name):
 						os.remove(output_name)

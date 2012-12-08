@@ -5,12 +5,9 @@ import subprocess
 from hashlib import md5
 from platform import system
 
-class BaseCompiler:
-    def linker_stage(self):
-        return True
-    
+class BaseCompiler:    
     def compile(self, output_base_path, files, flags, hashes):
-        object_files = []
+        output_files = []
         
         for f in files:
             parent_dir = os.path.dirname(f)
@@ -24,22 +21,22 @@ class BaseCompiler:
             file_hash = md5(open(f, 'rb').read()).hexdigest()
             output_file = os.path.join(output_path, '%s.o' % base_name)
             
-            if file_name in hashes and hashes[f] == file_hash and os.path.exists(output_file):
-                print('%s has not changed, will not compile.' % file_name)
+            if f in hashes and hashes[f] == file_hash and os.path.exists(output_file):
+                print('%s has not changed, will not compile.' % f)
             else:
                 print('Compiling %s' % f)
-                hashes[file_name] = file_hash
+                hashes[f] = file_hash
                 
                 args = ['g++', '-c', f, '-o', output_file] + flags
                 subprocess.check_call(args, stderr=subprocess.STDOUT, shell = True)
             
-            object_files.append(object_file)
+            output_files.append(output_file)
         
-        return object_files
+        return output_files
 
 class ExecutableCompiler(BaseCompiler):
-    def get_ouput_name(self, base_name):
-        if output_type == 'executable' and system().lower() == 'windows':
+    def get_output_name(self, base_name):
+        if system().lower() == 'windows':
             return '%s.exe' % base_name
         
         return base_name
