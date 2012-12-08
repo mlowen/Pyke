@@ -42,7 +42,7 @@ def compile_file(output_base_path, file_name, flags, hashes):
 	
 	return output_file
 
-def link_executable(output_path, file_name, object_files, flags, libraries):
+def link_executable(output_path, file_name, object_files, flags):
 	if not os.path.exists(output_path):
 		os.makedirs(output_path)
 	
@@ -50,11 +50,11 @@ def link_executable(output_path, file_name, object_files, flags, libraries):
 	
 	print('Linking %s' % executable_path)
 	
-	args = ['g++', '-o', executable_path] + object_files + flags + [ '-l%s' %l for l in libraries ]
+	args = ['g++', '-o', executable_path] + object_files + flags
 	
 	subprocess.check_call(args, stderr=subprocess.STDOUT, shell = True)
 
-def link_static_library(output_path, file_name, object_files, libraries):
+def link_static_library(output_path, file_name, object_files):
 	if not os.path.exists(output_path):
 		os.makedirs(output_path)
 	
@@ -66,7 +66,7 @@ def link_static_library(output_path, file_name, object_files, libraries):
 	
 	subprocess.check_call(args, stderr = subprocess.STDOUT, shell = True)
 
-def link_dynamic_library(output_path, file_name, object_files, flags, libraries):
+def link_dynamic_library(output_path, file_name, object_files, flags):
 	if not os.path.exists(output_path):
 		os.makedirs(output_path)
 	
@@ -74,6 +74,6 @@ def link_dynamic_library(output_path, file_name, object_files, flags, libraries)
 	
 	print('Linking %s' % executable_path)
 	
-	args = [ 'g++', '-shared', '-o', executable_path ] + object_files + flags + [ '-l%s' %l for l in libraries ]
+	args = [ 'g++', '-shared', '-o', executable_path ] + object_files + flags
 	
 	subprocess.check_call(args, stderr = subprocess.STDOUT, shell = True)

@@ -67,11 +67,11 @@ class BuildRunner(BaseRunner):
 			output_name = compiler.get_output_name(config.get_output_name(), output_type)			
 			
 			if output_type == 'executable':
-				compiler.link_executable(config.get_output_path(), output_name, object_files, config.get_linker_flags(), config.get_libraries())
+				compiler.link_executable(config.get_output_path(), output_name, object_files, config.get_linker_flags())
 			elif output_type == 'sharedlib':
-				compiler.link_static_library(config.get_output_path(), output_name, object_files, config.get_linker_flags(), config.get_libraries())
+				compiler.link_static_library(config.get_output_path(), output_name, object_files, config.get_linker_flags())
 			elif output_type == 'dynamiclib':
-				compiler.link_dynamic_library(config.get_output_path(), output_name, object_files, config.get_linker_flags(), config.get_libraries())
+				compiler.link_dynamic_library(config.get_output_path(), output_name, object_files, config.get_linker_flags())
 			else:
 				raise Exception('Unknown output type: %s' % output_type)
 			

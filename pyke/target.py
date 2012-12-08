@@ -54,10 +54,7 @@ class Config:
 	
 	def get_linker_flags(self):
 		return self.get_list('linker_flags', [])
-	
-	def get_libraries(self):
-		return self.get_list('libraries', [])
-	
+		
 	def get_prebuild(self):
 		return self.get_string('prebuild', None)
 		
