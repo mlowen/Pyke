@@ -33,6 +33,9 @@ class BaseCompiler:
             output_files.append(output_file)
         
         return output_files
+    
+    def get_source_patterns(self):
+        return [ '*.cc', '*.cpp', '*.cxx' ]
 
 class ExecutableCompiler(BaseCompiler):
     def get_output_name(self, base_name):

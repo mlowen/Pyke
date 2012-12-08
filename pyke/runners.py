@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 
+from fnmatch import fnmatchcase
 from platform import system
 from pyke import compilers
 from pyke import target
@@ -34,6 +35,14 @@ class BaseRunner:
 class BuildRunner(BaseRunner):
 	def __init__(self, build_file, base_path):
 		BaseRunner.__init__(self, build_file, base_path)
+	
+	def get_source_files(self, paths, patterns):
+		files = [ f for f in paths if os.path.exists(f) and os.path.isfile(f) and True in [ fnmatchcase(f, p) for p in patterns ] ]
+		
+		for directory in [ d for d in paths if os.path.exists(d) and os.path.isdir(d) ]:
+			files += self.get_source_files([ os.path.join(directory, child) for child in os.listdir(directory) ], patterns)
+		
+		return files
 		
 	def run(self, targets):
 		if isinstance(targets, list):
@@ -61,7 +70,14 @@ class BuildRunner(BaseRunner):
 			hashes = self.pyke_file[target_name] if target_name in self.pyke_file else {}
 			
 			# Compile
-			object_files = compiler.compile(obj_dir, config.get_source_files(), config.get_compiler_flags(), hashes)
+			source_paths = config.get_source_paths();
+			source_patterns = config.get_source_patterns();
+			
+			if source_patterns is None:
+				source_patterns = compiler.get_source_patterns()
+			
+			source_files = self.get_source_files(source_paths, source_patterns)
+			object_files = compiler.compile(obj_dir, source_files, config.get_compiler_flags(), hashes)
 			
 			# Link
 			output_name = compiler.get_output_name(config.get_output_name())			
