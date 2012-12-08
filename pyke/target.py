@@ -24,7 +24,7 @@ class Config:
 		return self.get_string('compiler', 'g++')
 		
 	def get_source_paths(self):
-		return self.get_list('source_paths', None)
+		return self.get_list('source_paths', os.getcwd())
 	
 	def get_source_patterns(self):
 		 return self.get_list('source_patterns', [ '*.cc', '*.cpp', '*.cxx' ])
