@@ -3,7 +3,7 @@ from fnmatch import fnmatchcase
 
 class Config:
 	def __init__(self, data = None):
-		if data == None:
+		if data is None:
 			self.data = {}
 		else:
 			self.data = data
@@ -27,10 +27,10 @@ class Config:
 		 return self.get_list('source_patterns', [ '*.cc', '*.cpp', '*.cxx' ])
 	
 	def get_source_files(self, paths = None, patterns = None):
-		if patterns == None:
+		if patterns is None:
 			patterns = self.get_source_patterns()
 		
-		if paths == None:
+		if paths is None:
 			paths = self.get_source_paths()
 		
 		files = [ f for f in paths if os.path.exists(f) and os.path.isfile(f) and True in [ fnmatchcase(f, p) for p in patterns ] ]

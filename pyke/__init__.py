@@ -72,7 +72,7 @@ def main():
 			for t in build_file.get_all_targets():
 				print(t)
 		else:
-			base_path = os.path.dirname(build_file_path) 	
+			base_path = os.path.dirname(build_file_path)
 			
 			os.chdir(base_path)
 			
