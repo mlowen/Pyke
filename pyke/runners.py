@@ -6,7 +6,7 @@ from platform import system
 from pyke import compiler
 from pyke import target
 
-class BuildRunner:
+class BaseRunner:
 	def __init__(self, build_file, base_path):
 		self.build_file = build_file
 		self.pyke_path = os.path.join(base_path, '.pyke')
@@ -19,6 +19,15 @@ class BuildRunner:
 			self.pyke_file = json.load(open(self.pyke_file_path))
 		else:
 			self.pyke_file = {}
+	
+	def write_pyke_file(self):
+		fp = open(self.pyke_file_path, 'w')
+		json.dump(self.pyke_file, fp)
+		fp.close()
+
+class BuildRunner(BaseRunner):
+	def __init__(self, build_file, base_path):
+		BaseRunner.__init__(self, build_file, base_path)
 		
 	def build(self, targets):
 		if isinstance(targets, list):
@@ -138,8 +147,3 @@ class BuildRunner:
 	
 	def clean_all(self):
 		self.clean(self.build_file.get_all_targets())
-	
-	def write_pyke_file(self):
-		fp = open(self.pyke_file_path, 'w')
-		json.dump(self.pyke_file, fp)
-		fp.close()

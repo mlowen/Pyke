@@ -41,7 +41,7 @@ def main():
 	parser.add_argument('-c', '--clean', dest = 'action', action = 'store_const', 
 		const = 'clean', help = 'Remove all build artifacts generated when the target is built.')
 	
-	parser.add_argument('-a', '--all', dest = 'action',
+	parser.add_argument('-a', '--all', dest = 'all_targets',
 		action = 'store_true', help = 'Run build/clean against all targets in the build file.')
 	
 	parser.add_argument('-j', '--json', dest = 'build_json', action = 'store_true', 
@@ -79,23 +79,23 @@ def main():
 			build_runner = runners.BuildRunner(build_file, base_path)
 			ret = None
 			
-			try:
-				if args.action == 'clean':
-					if args.all_targets:
-						build_runner.clean_all()
-					else:
-						build_runner.clean(args.targets)
-				if args.action == 'dependencies':
-					print('Dependencies need to be generated.')
+			#try:
+			if args.action == 'clean':
+				if args.all_targets:
+					build_runner.clean_all()
 				else:
-					if args.all_targets:
-						build_runner.build_all()
-					else:
-						build_runner.build(args.targets)
-			except Exception as e:
-				print('An error occurred while building your project, see above for details.')
-				print(e)
-				ret = 1
+					build_runner.clean(args.targets)
+			if args.action == 'dependencies':
+				print('Dependencies need to be generated.')
+			else:
+				if args.all_targets:
+					build_runner.build_all()
+				else:
+					build_runner.build(args.targets)
+			#except Exception as e:
+			#	print('An error occurred while building your project, see above for details.')
+			#	print(e)
+			#	ret = 1
 			
 			build_runner.write_pyke_file()
 		
