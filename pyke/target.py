@@ -19,6 +19,9 @@ class Config:
 	
 	def get_string(self, key, default):
 		return self.data[key] if key in self.data and isinstance(self.data[key], str) else default
+	
+	def get_compiler(self):
+		return self.get_string('compiler', 'g++')
 		
 	def get_source_paths(self):
 		return self.get_list('source_paths', None)

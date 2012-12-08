@@ -47,7 +47,7 @@ class BuildRunner(BaseRunner):
 				raise Exception('Target %s does not exist.' % target_name)
 			
 			config = self.build_file.run_target(target_name)
-			compiler = compilers.factory('g++', config.get_output_type())
+			compiler = compilers.factory(config.get_compiler(), config.get_output_type())
 			
 			custom_prebuild = config.get_prebuild()
 			
