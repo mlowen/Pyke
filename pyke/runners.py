@@ -4,7 +4,9 @@ import shutil
 
 from fnmatch import fnmatchcase
 from platform import system
+
 from pyke import compilers
+from pyke import meta
 from pyke import target
 
 def factory(action, build_file, base_path):
@@ -17,20 +19,14 @@ class BaseRunner:
 	def __init__(self, build_file, base_path):
 		self.build_file = build_file
 		self.pyke_path = os.path.join(base_path, '.pyke')
-		self.pyke_file_path = os.path.join(self.pyke_path, 'pyke.json')
 		
 		if not os.path.exists(self.pyke_path):
 			os.mkdir(self.pyke_path)
 		
-		if os.path.exists(self.pyke_file_path):
-			self.pyke_file = json.load(open(self.pyke_file_path))
-		else:
-			self.pyke_file = {}
+		self.meta_data = meta.MetaFile(os.path.join(self.pyke_path, 'pyke.json'))
 	
-	def write_pyke_file(self):
-		fp = open(self.pyke_file_path, 'w')
-		json.dump(self.pyke_file, fp)
-		fp.close()
+	def write_meta_data(self):
+		self.meta_data.write()
 
 class BuildRunner(BaseRunner):
 	def __init__(self, build_file, base_path):
@@ -55,6 +51,7 @@ class BuildRunner(BaseRunner):
 			if not self.build_file.target_exists(target_name):
 				raise Exception('Target %s does not exist.' % target_name)
 			
+			self.meta_data.set_target(target_name)
 			config = self.build_file.run_target(target_name)
 			compiler = compilers.factory(config.get_compiler(), config.get_output_type())
 			
@@ -66,8 +63,7 @@ class BuildRunner(BaseRunner):
 				self.build_file.run_prebuild(target_name)
 			
 			# Setup
-			obj_dir = os.path.join(self.pyke_path, target_name)
-			hashes = self.pyke_file[target_name] if target_name in self.pyke_file else {}
+			compiler.set_object_directory(os.path.join(self.pyke_path, target_name))
 			
 			# Compile
 			source_paths = config.get_source_paths();
@@ -77,13 +73,22 @@ class BuildRunner(BaseRunner):
 				source_patterns = compiler.get_source_patterns()
 			
 			source_files = self.get_source_files(source_paths, source_patterns)
-			object_files = compiler.compile(obj_dir, source_files, config.get_compiler_flags(), hashes)
+			object_files = []
+			
+			for f in source_files:
+				object_file = compiler.get_object_file_name(f)
+				
+				if self.meta_data.has_file_changed(f) or not os.path.exists(object_file):
+					print('Compiling %s' % f)
+					compiler.compile(f, config.get_compiler_flags())
+				else:
+					print('%s has not changed, will not compile.' % f)
+				
+				object_files.append(object_file)
 			
 			# Link
 			output_name = compiler.get_output_name(config.get_output_name())			
 			compiler.link(config.get_output_path(), output_name, object_files, config.get_linker_flags())
-			
-			self.pyke_file[target_name] = hashes
 			
 			custom_postbuild = config.get_postbuild()
 			
@@ -113,9 +118,7 @@ class CleanRunner(BaseRunner):
 				raise Exception('Target %s does not exist.' % target_name)
 			
 			# Delete pyke generated  intermediate files
-			if target_name in self.pyke_file:
-				del self.pyke_file[target_name]
-				
+			self.meta_data.delete_target(target_name)
 			obj_dir = os.path.join(self.pyke_path, target_name)
 			
 			if(os.path.exists(obj_dir)):

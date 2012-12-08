@@ -5,37 +5,35 @@ import subprocess
 from hashlib import md5
 from platform import system
 
-class BaseCompiler:    
-    def compile(self, output_base_path, files, flags, hashes):
-        output_files = []
+class BaseCompiler:
+    def __init__(self):
+        self.obj_dir = ''
+    
+    def compile(self, file_name, flags):
+        output_file = self.get_object_file_name(file_name)
+        output_path = os.path.dirname(output_file)
         
-        for f in files:
-            parent_dir = os.path.dirname(f)
-            base_name = os.path.splitext(os.path.basename(f))[0]
-            output_path = os.path.join(output_base_path, parent_dir)
-            
-            if not os.path.exists(output_path):
-                os.makedirs(output_path)
-            
-            # Create the file hash
-            file_hash = md5(open(f, 'rb').read()).hexdigest()
-            output_file = os.path.join(output_path, '%s.o' % base_name)
-            
-            if f in hashes and hashes[f] == file_hash and os.path.exists(output_file):
-                print('%s has not changed, will not compile.' % f)
-            else:
-                print('Compiling %s' % f)
-                hashes[f] = file_hash
-                
-                args = ['g++', '-c', f, '-o', output_file] + flags
-                subprocess.check_call(args, stderr=subprocess.STDOUT, shell = True)
-            
-            output_files.append(output_file)
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
         
-        return output_files
+        args = ['g++', '-c', file_name, '-o', output_file] + flags
+        subprocess.check_call(args, stderr=subprocess.STDOUT, shell = True)
+    
+    def get_object_file_name(self, file_name):
+        base_name = os.path.splitext(os.path.basename(file_name))[0]
+        parent_dir = os.path.dirname(file_name)
+        output_path = os.path.join(self.obj_dir, parent_dir)
+        
+        return os.path.join(output_path, '%s.o' % base_name)
     
     def get_source_patterns(self):
         return [ '*.cc', '*.cpp', '*.cxx' ]
+    
+    def set_object_directory(self, obj_dir):
+        self.obj_dir = obj_dir
+        
+        if not os.path.exists(self.obj_dir):
+            os.makedirs(self.obj_dir)
 
 class ExecutableCompiler(BaseCompiler):
     def get_output_name(self, base_name):
