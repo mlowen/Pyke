@@ -53,16 +53,43 @@ class MetaFile:
         elif isinstance(dependencies, dict):
             self.dependencies[self.target][file_name] = dependencies
     
+    def get_file_dependencies(self, file_name):
+        if file_name not in self.dependencies[self.target]:
+            return None
+        
+        return self.dependencies[self.target][file_name].keys()
+    
+    def get_file_dependency_hash(self, file_name, dependency):
+        return self.dependencies[self.target][file_name][dependency]
+    
+    def set_file_dependency_hash(self, file_name, dependency, hash):
+        self.dependencies[self.target][file_name][dependency] = hash
+    
     # Other
     def has_file_changed(self, file_name):
+        changed = False
+        
+        # File Hash
         stored_hash = self.get_hash_for_file(file_name)
         computed_hash = md5(open(file_name, 'rb').read()).hexdigest()
+                
+        if stored_hash is None and stored_hash != computed_hash:
+            changed = True
+            self.set_hash_for_file(file_name, computed_hash)
         
-        if stored_hash is not None and stored_hash == computed_hash:
-            return False
+        # File Dependencies
+        dependencies = self.get_file_dependencies(file_name)
         
-        self.set_hash_for_file(file_name, computed_hash)
-        return True
+        if dependencies is not None:
+            for dependency in dependencies:
+                stored_hash = self.get_file_dependency_hash(file_name, dependency)
+                computed_hash = md5(open(dependency, 'rb').read()).hexdigest()
+                
+                if stored_hash is None or stored_hash != computed_hash:
+                    changed = True
+                    self.set_file_dependency_hash(file_name, dependency, computed_hash)
+        
+        return changed
     
     def delete_target(self, target = None):
         if self.target is None and target is None:
