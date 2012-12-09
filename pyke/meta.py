@@ -27,7 +27,11 @@ class MetaFile:
         
         if self.target not in self.hashes:
             self.hashes[self.target] = { }
+        
+        if self.target not in self.dependencies:
+            self.dependencies[self.target] = { }
     
+    # Hashes
     def get_hash_for_file(self, file_name):
         if file_name in self.hashes[self.target]:
             return self.hashes[self.target][file_name]
@@ -37,6 +41,19 @@ class MetaFile:
     def set_hash_for_file(self, file_name, hash):
         self.hashes[self.target][file_name] = hash
     
+    # Dependencies
+    def set_file_dependencies(self, file_name, dependencies):
+        if isinstance(dependencies, list):
+            data = {}
+            
+            for d in dependencies:
+                data[d] = None
+            
+            self.dependencies[self.target][file_name] = data
+        elif isinstance(dependencies, dict):
+            self.dependencies[self.target][file_name] = dependencies
+    
+    # Other
     def has_file_changed(self, file_name):
         stored_hash = self.get_hash_for_file(file_name)
         computed_hash = md5(open(file_name, 'rb').read()).hexdigest()

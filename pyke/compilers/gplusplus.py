@@ -1,13 +1,14 @@
 # g++ compiler classes
 import os
+import re
 import subprocess
 
-from hashlib import md5
 from platform import system
 
 class BaseCompiler:
     def __init__(self):
         self.obj_dir = ''
+        self.dependency_regex = re.compile('#include \"([^\"]+)\"')
     
     def compile(self, file_name, flags):
         output_file = self.get_object_file_name(file_name)
@@ -25,6 +26,31 @@ class BaseCompiler:
         output_path = os.path.join(self.obj_dir, parent_dir)
         
         return os.path.join(output_path, '%s.o' % base_name)
+    
+    def get_file_dependencies(self, file_name):
+        fp = open(file_name, 'r')
+        parent_dir = os.path.dirname(file_name)
+        
+        results = self.dependency_regex.search(fp.read())
+        dependencies = []
+        
+        if results is not None:
+            for header in [ os.path.normpath(os.path.join(parent_dir, f)) for f in results.groups() ]:
+                dependencies.append(header)
+                
+                hp = open(header, 'r')
+                
+                header_results = self.dependency_regex.search(hp.read())
+                
+                if header_results is not None:
+                    header_parent = os.path.dirname(header)
+                    dependencies.extend([ os.path.normpath(os.path.join(header_parent, h)) for h in header_results.groups() ])
+                
+                hp.close()
+        
+        fp.close()
+        
+        return dependencies
     
     def get_source_patterns(self):
         return [ '*.cc', '*.cpp', '*.cxx' ]
