@@ -26,7 +26,7 @@ class CleanRunner(BaseRunner):
         custom_clean = config.get_clean()
         
         # Check if the build file has a custom clean available.
-        if not custom_clean == None and self.build_file.method_exists(custom_clean):
+        if custom_clean is not None and self.build_file.method_exists(custom_clean):
             self.build_file.run_method(custom_clean)
         elif self.build_file.clean_exists(target_name):
             self.build_file.run_clean(target_name)

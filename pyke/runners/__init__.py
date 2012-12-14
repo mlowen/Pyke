@@ -1,11 +1,6 @@
 import os
-import json
-import shutil
 
 from fnmatch import fnmatchcase
-from platform import system
-
-from pyke import compilers
 from pyke import meta
 
 class BaseRunner:
@@ -38,6 +33,8 @@ class BaseRunner:
 	
 	def write_meta_data(self):
 		self.meta_data.write()
+
+## Factory ##
 
 from pyke.runners import build
 from pyke.runners import clean

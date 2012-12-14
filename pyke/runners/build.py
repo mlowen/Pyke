@@ -19,7 +19,7 @@ class BuildRunner(BaseRunner):
         
         custom_prebuild = config.get_prebuild()
         
-        if not custom_prebuild == None and self.build_file.method_exists(custom_prebuild):
+        if custom_prebuild is not None and self.build_file.method_exists(custom_prebuild):
             self.build_file.run_method(custom_prebuild)
         elif self.build_file.prebuild_exists(target_name):
             self.build_file.run_prebuild(target_name)
@@ -61,7 +61,7 @@ class BuildRunner(BaseRunner):
         
         custom_postbuild = config.get_postbuild()
         
-        if not custom_postbuild == None and self.build_file.method_exists(custom_postbuild):
+        if custom_postbuild is not None and self.build_file.method_exists(custom_postbuild):
             self.build_file.run_method(custom_postbuild)
         elif self.build_file.postbuild_exists(target_name):
             self.build_file.run_postbuild(target_name)
