@@ -21,7 +21,7 @@ setup(
 	author_email = pyke.__author_email__,
 	url = pyke.__homepage__,
 	license = pyke.__license__,
-	packages = [ 'pyke', 'pyke.compilers' ],
+	packages = [ 'pyke', 'pyke.compilers', 'pyke.runners' ],
 	entry_points = { 'console_scripts': [ 'pyke = pyke:main' ]},
 	zip_safe = False
 )
