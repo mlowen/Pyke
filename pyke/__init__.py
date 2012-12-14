@@ -9,7 +9,7 @@ from pyke import buildfile
 # Meta Information
 __version__ = '0.3.7-beta'
 __name__ = 'Pyke'
-__description__ = 'Pyke is a build system for the gcc c++ compiler.'
+__description__ = 'Build system for the GCC C++ compiler.'
 __author__ = 'Mike Lowen'
 __author_email__ = 'mike@mlowen.com'
 __homepage__ = 'http://mlowen.com'
@@ -21,7 +21,7 @@ def version():
 	print('Available for use under the %s license.' % __license__)
 	
 def main():
-	parser = argparse.ArgumentParser(description = 'A C++ build tool.')
+	parser = argparse.ArgumentParser(description = __description__)
 		
 	# Command line arguments
 	parser.add_argument('-t', '--target', dest = 'targets', 
