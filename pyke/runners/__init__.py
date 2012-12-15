@@ -13,6 +13,11 @@ class BaseRunner:
 		
 		self.meta_data = meta.MetaFile(os.path.join(self.pyke_path, 'pyke.json'))
 	
+	def __init__(self, build_file, pyke_path, meta_data):
+		self.build_file = build_file
+		self.pyke_path = pyke_path
+		self.meta_data = meta_data
+		
 	def run(self, targets):
 		if isinstance(targets, list):
 			for t in targets:
