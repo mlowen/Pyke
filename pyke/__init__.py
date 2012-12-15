@@ -7,7 +7,7 @@ from pyke import runners
 from pyke import buildfile
 
 # Meta Information
-__version__ = '0.3.7-beta'
+__version__ = '0.4.8-beta'
 __name__ = 'Pyke'
 __description__ = 'Build system for the GCC C++ compiler.'
 __author__ = 'Mike Lowen'
@@ -50,6 +50,9 @@ def main():
 	parser.add_argument('-d', '--dependencies', dest = 'action', action = 'store_const', const = 'dependencies',
 		help = 'Generate and store the dependencies for the source files in the target.')
 	
+	parser.add_argument('-r', '--rebuild', dest = 'action', action = 'store_const', const = 'rebuild',
+		help = 'Runs a clean followed by a build on the specified targets.')
+    
 	args = parser.parse_args()
 	
 	# Run the application
@@ -77,7 +80,7 @@ def main():
 			os.chdir(base_path)
 			
 			runner = runners.factory(args.action, build_file, base_path)
-			ret = None
+			ret = 0
 			
 			try:
 				if args.all_targets:
@@ -90,9 +93,7 @@ def main():
 				ret = 1
 			
 			runner.write_meta_data()
-		
-			if not ret == None:
-				sys.exit(ret)
+			sys.exit(ret)
 
 if __name__ == '__main__':
 	main()

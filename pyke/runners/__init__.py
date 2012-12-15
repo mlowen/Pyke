@@ -4,19 +4,19 @@ from fnmatch import fnmatchcase
 from pyke import meta
 
 class BaseRunner:
-	def __init__(self, build_file, base_path):
+	def __init__(self, build_file, base_path, meta_data = None):
 		self.build_file = build_file
-		self.pyke_path = os.path.join(base_path, '.pyke')
 		
-		if not os.path.exists(self.pyke_path):
-			os.mkdir(self.pyke_path)
-		
-		self.meta_data = meta.MetaFile(os.path.join(self.pyke_path, 'pyke.json'))
-	
-	def __init__(self, build_file, pyke_path, meta_data):
-		self.build_file = build_file
-		self.pyke_path = pyke_path
-		self.meta_data = meta_data
+		if meta_data is not None:
+			self.pyke_path = base_path
+			self.meta_data = meta_data
+		else:
+			self.pyke_path = os.path.join(base_path, '.pyke')
+			
+			if not os.path.exists(self.pyke_path):
+				os.mkdir(self.pyke_path)
+			
+			self.meta_data = meta.MetaFile(os.path.join(self.pyke_path, 'pyke.json'))
 		
 	def run(self, targets):
 		if isinstance(targets, list):
@@ -44,11 +44,14 @@ class BaseRunner:
 from pyke.runners import build
 from pyke.runners import clean
 from pyke.runners import dependency
+from pyke.runners import rebuild
 
 def factory(action, build_file, base_path):
 	if action == 'clean':
 		return clean.CleanRunner(build_file, base_path)
 	elif action == 'dependencies':
 		return dependency.DependencyRunner(build_file, base_path)
+	elif action == 'rebuild':
+		return rebuild.RebuildRunner(build_file, base_path)
 	
 	return build.BuildRunner(build_file, base_path)

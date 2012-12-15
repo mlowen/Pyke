@@ -95,7 +95,7 @@ class MetaFile:
         if self.target is None and target is None:
             raise Exception('No target specified')
         
-        if target is not None:
-            del self.hashes[target]
-        elif self.target is not None:
-            del self.hashes[self.target]
+        t = target if target is not None else self.target
+		
+        if t in self.hashes:
+        	del self.hashes[t]

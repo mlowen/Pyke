@@ -4,8 +4,8 @@ from pyke import compilers
 from pyke.runners import BaseRunner
 
 class BuildRunner(BaseRunner):
-    def __init__(self, build_file, base_path):
-        BaseRunner.__init__(self, build_file, base_path)
+    def __init__(self, build_file, base_path, meta_data = None):
+        BaseRunner.__init__(self, build_file, base_path, meta_data)
         
     def run_target(self, target_name):
         print('Starting build: %s' % target_name)
