@@ -9,18 +9,22 @@ To install pyke you need to have a package that supplies easy\_install installed
 
 ## Usage
 
-`pyke [-h] [-t target [target ...]] [-f file] [-v] [-l] [-c] [-a]`
+`pyke [-h] [-t target [target ...]] [-f file] [-v] [-l] [-c] [-a] [-j] [-d] [-r]`
 
-### Optional Arguments:
-* `-h, --help` show this help message and exit
-* `-t target [target ...], --target target [target ...]` Targets to build, default target is 'default'
-* `-f file, --file file` The build file to load, default file name is 'build.pyke'
-* `-v, --version` Displays version information.
-* `-l, --list` Lists all of the available targets in the build file.
-* `-c, --clean` Remove all build artifacts generated when the target is built.
+### Arguments:
+
+When running pyke all arguments are optional.
+
 * `-a, --all` Run build/clean against all targets in the build file.
-* `-j, --json` Force the file to load as json, when no file is specified then the default file name will be 'build.json'
+* `-c, --clean` Remove all build artifacts generated when the target is built.
 * `-d, --dependencies` Generates and stores the dependencies for the source files in the target.
+* `-f file, --file file` The build file to load, default file name is 'build.pyke'
+* `-h, --help` show this help message and exit
+* `-j, --json` Force the file to load as json, when no file is specified then the default file name will be 'build.json'
+* `-l, --list` Lists all of the available targets in the build file.
+* `-r, --rebuild` Runs a clean followed by a build on the specified targets.
+* `-t target [target ...], --target target [target ...]` Targets to build, default target is 'default'
+* `-v, --version` Displays version information.
 
 ## Pyke File
 A pyke build file for all intents and purposes is a python script, anything you can do in a python script can be done in a pyke script.  A build (including pre & post build methods) are run from the directory that the build file is located in which will be referred to as the base path in this section.
