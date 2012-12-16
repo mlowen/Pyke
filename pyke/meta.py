@@ -72,8 +72,8 @@ class MetaFile:
         # File Hash
         stored_hash = self.get_hash_for_file(file_name)
         computed_hash = md5(open(file_name, 'rb').read()).hexdigest()
-                
-        if stored_hash is None and stored_hash != computed_hash:
+        
+        if stored_hash is None or stored_hash != computed_hash:
             changed = True
             self.set_hash_for_file(file_name, computed_hash)
         
