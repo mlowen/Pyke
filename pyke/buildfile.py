@@ -62,8 +62,14 @@ class PythonFileWrapper(FileWrapperBase):
 		
 		name, extension = os.path.splitext(path)
 		
+		# Don't want to created the __pycache__ folder in the users project.
+		original_value = sys.dont_write_bytecode
+		sys.dont_write_bytecode = True
+		
 		self.module = imp.load_module(os.path.basename(name), open(path), path, (extension, 'r', imp.PY_SOURCE))
 		self.methods = [ i[0] for i in inspect.getmembers(self.module) if inspect.isfunction(i[1]) ]
+		
+		sys.dont_write_bytecode = original_value
 	
 	# Target	
 	def target_exists(self, target_name):

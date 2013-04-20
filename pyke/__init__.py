@@ -7,7 +7,7 @@ from pyke import runners
 from pyke import buildfile
 
 # Meta Information
-__version__ = '0.4.9-beta'
+__version__ = '0.4.10-beta'
 __name__ = 'Pyke'
 __description__ = 'Build system for the GCC C++ compiler.'
 __author__ = 'Mike Lowen'
@@ -17,7 +17,7 @@ __license__ = 'MIT'
 
 def version():
 	print('%s %s' % (__name__, __version__))
-	print('Copyright (C) 2012 %s' % __author__)
+	print('Copyright (C) 2013 %s' % __author__)
 	print('Available for use under the %s license.' % __license__)
 	
 def main():
