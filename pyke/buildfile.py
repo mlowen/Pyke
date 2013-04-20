@@ -2,6 +2,7 @@ import imp
 import os
 import inspect
 import json
+import sys
 
 from pyke import target
 
@@ -24,10 +25,10 @@ class FileWrapperBase:
 		return "%s%s" % (self.clean_prefix, target)
 
 class JsonFileWrapper(FileWrapperBase):
-	def __init__(self, data):
+	def __init__(self, path):
 		FileWrapperBase.__init__(self)
 		
-		self.data = data
+		self.data = json.load(open(path, 'r'))
 	
 	# Target
 	def target_exists(self, target_name):
@@ -56,10 +57,12 @@ class JsonFileWrapper(FileWrapperBase):
 		return False
 
 class PythonFileWrapper(FileWrapperBase):
-	def __init__(self, module):
+	def __init__(self, path):
 		FileWrapperBase.__init__(self)
 		
-		self.module = module
+		name, extension = os.path.splitext(path)
+		
+		self.module = imp.load_module(os.path.basename(name), open(path), path, (extension, 'r', imp.PY_SOURCE))
 		self.methods = [ i[0] for i in inspect.getmembers(self.module) if inspect.isfunction(i[1]) ]
 	
 	# Target	
@@ -110,18 +113,13 @@ def load(filepath):
 	if not os.path.exists(filepath):
 		raise Exception('Unable to load build file: %s' % filepath)
 	
-	fp = open(filepath, 'r')
-	filename, extension = os.path.splitext(filepath)
+	extension = os.path.splitext(filepath)[1]
 	
 	build_file = None
 	
 	if extension == '.pyke':
-		module = imp.load_module(os.path.basename(filename), fp, filepath, (extension, 'r', imp.PY_SOURCE))
-		
-		build_file = PythonFileWrapper(module)
+		build_file = PythonFileWrapper(filepath)
 	elif extension == '.json':
-		build_file = JsonFileWrapper(json.load(fp))
-	
-	fp.close()
+		build_file = JsonFileWrapper(filepath)
 	
 	return build_file
