@@ -21,16 +21,18 @@ class BuildRunner(BaseRunner):
         elif self.build_file.prebuild_exists(target_name):
             self.build_file.run_prebuild(target_name)
         
-        # Setup
-        compiler = compilers.factory(config.compiler, config.output_type)
-        compiler.set_object_directory(os.path.join(self.pyke_path, target_name))
-        
-        # Compile
-        object_files = self.compile(config, compiler)
-        
-        # Link
-        self.link(config, compiler, object_files)
-        
+        if config.is_phoney and self.build_file.method_exists(config.run):
+            self.build_file.run_method(config.run)
+        elif not config.is_phoney:
+            # Setup
+            compiler = compilers.factory(config.compiler, config.output_type)
+            compiler.set_object_directory(os.path.join(self.pyke_path, target_name))
+            
+            # Compile
+            object_files = self.compile(config, compiler)
+            
+            # Link
+            self.link(config, compiler, object_files)
         
         if config.postbuild is not None and self.build_file.method_exists(config.postbuild):
             self.build_file.run_method(config.postbuild)

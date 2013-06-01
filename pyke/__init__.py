@@ -82,15 +82,15 @@ def main():
 			runner = runners.factory(args.action, build_file, base_path)
 			ret = 0
 			
-			try:
-				if args.all_targets:
-					runner.run_all()
-				else:
-					runner.run(args.targets)
-			except Exception as e:
-				print('An error occurred while building your project, see above for details.')
-				print(e)
-				ret = 1
+			#try:
+			if args.all_targets:
+				runner.run_all()
+			else:
+				runner.run(args.targets)
+			#except Exception as e:
+			#	print('An error occurred while building your project, see above for details.')
+			#	print(e)
+			#	ret = 1
 			
 			runner.write_meta_data()
 			sys.exit(ret)
