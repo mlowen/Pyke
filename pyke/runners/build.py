@@ -8,14 +8,18 @@ class BuildRunner(BaseRunner):
         BaseRunner.__init__(self, build_file, base_path, meta_data)
         
     def run_target(self, target_name):
-        print('Starting build: %s' % target_name)
-        
         if not self.build_file.target_exists(target_name):
             raise Exception('Target %s does not exist.' % target_name)
-        
-        self.meta_data.set_target(target_name)
+                
         config = self.build_file.run_target(target_name)
         
+        if config.dependencies is not None:
+            print ('We have dependencies')
+        
+        print('Starting build: %s' % target_name)
+        
+        self.meta_data.set_target(target_name)
+                
         if config.prebuild is not None and self.build_file.method_exists(config.prebuild):
             self.build_file.run_method(config.prebuild)
         elif self.build_file.prebuild_exists(target_name):

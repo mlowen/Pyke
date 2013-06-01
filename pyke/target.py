@@ -2,16 +2,21 @@ import os
 
 _defaults = {
 	'source_paths': os.getcwd(),
+	'source_patterns': None,
+	
 	'output_path': os.getcwd(),
 	'output_name': os.path.basename(os.getcwd()),
 	'output_type': 'executable',
-	'source_patterns': None,
+	
 	'compiler_flags': [],
 	'linker_flags': [],
+	
 	'prebuild': None,
 	'postbuild': None,
 	'clean': None,
-	'is_phoney': False
+	
+	'is_phoney': False,
+	'dependencies': None
 }
 
 class Config:
