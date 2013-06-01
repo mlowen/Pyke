@@ -15,12 +15,10 @@ class BuildRunner(BaseRunner):
         
         self.meta_data.set_target(target_name)
         config = self.build_file.run_target(target_name)
-        compiler = compilers.factory(config.get_compiler(), config.get_output_type())
+        compiler = compilers.factory(config.compiler, config.output_type)
         
-        custom_prebuild = config.get_prebuild()
-        
-        if custom_prebuild is not None and self.build_file.method_exists(custom_prebuild):
-            self.build_file.run_method(custom_prebuild)
+        if config.prebuild is not None and self.build_file.method_exists(config.prebuild):
+            self.build_file.run_method(config.prebuild)
         elif self.build_file.prebuild_exists(target_name):
             self.build_file.run_prebuild(target_name)
         
@@ -28,13 +26,12 @@ class BuildRunner(BaseRunner):
         compiler.set_object_directory(os.path.join(self.pyke_path, target_name))
         
         # Compile
-        source_paths = config.get_source_paths();
-        source_patterns = config.get_source_patterns();
+        source_patterns = config.source_patterns
         
         if source_patterns is None:
             source_patterns = compiler.get_source_patterns()
         
-        source_files = self.get_source_files(source_paths, source_patterns)
+        source_files = self.get_source_files(config.source_paths, source_patterns)
         object_files = []
         
         for f in source_files:
@@ -49,20 +46,17 @@ class BuildRunner(BaseRunner):
             object_files.append(object_file)
         
         # Link
-        output_name = compiler.get_output_name(config.get_output_name())
-        output_path = config.get_output_path()
+        output_name = compiler.get_output_name(config.output_name)
         
         print('Linking %s' % output_name)
         
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
+        if not os.path.exists(config.output_path):
+            os.makedirs(config.output_path)
                     
-        compiler.link(os.path.join(output_path, output_name), object_files, config.get_linker_flags())
+        compiler.link(os.path.join(config.output_path, output_name), object_files, config.linker_flags)
         
-        custom_postbuild = config.get_postbuild()
-        
-        if custom_postbuild is not None and self.build_file.method_exists(custom_postbuild):
-            self.build_file.run_method(custom_postbuild)
+        if config.postbuild is not None and self.build_file.method_exists(config.postbuild):
+            self.build_file.run_method(config.postbuild)
         elif self.build_file.postbuild_exists(target_name):
             self.build_file.run_postbuild(target_name)
         
