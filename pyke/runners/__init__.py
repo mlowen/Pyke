@@ -3,6 +3,12 @@ import os
 from fnmatch import fnmatchcase
 from pyke import meta
 
+class RunnerException(Exception):
+	def __init__(self, message):
+		Exception.__init__(self, message)
+		
+		self.message = message
+
 class BaseRunner:
 	def __init__(self, build_file, base_path, meta_data = None):
 		self.build_file = build_file

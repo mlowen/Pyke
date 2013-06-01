@@ -1,11 +1,15 @@
 import os
 
 from pyke import compilers
-from pyke.runners import BaseRunner
+from . import BaseRunner
+from . import RunnerException
 
 class BuildRunner(BaseRunner):
     def __init__(self, build_file, base_path, meta_data = None):
         BaseRunner.__init__(self, build_file, base_path, meta_data)
+        
+        self.to_build = []
+        self.built = []
         
     def run_target(self, target_name):
         if not self.build_file.target_exists(target_name):
@@ -13,8 +17,16 @@ class BuildRunner(BaseRunner):
                 
         config = self.build_file.run_target(target_name)
         
+        self.to_build.append(target_name)
+        
         if config.dependencies is not None:
-            print ('We have dependencies')
+            targets = [d for d in config.dependencies if d not in self.built]
+            
+            for t in targets:
+                if t in self.to_build:
+                    raise RunnerException('Circular dependency has been detected for target %s.' % t)
+                
+                self.run_target(t)
         
         print('Starting build: %s' % target_name)
         
@@ -42,6 +54,9 @@ class BuildRunner(BaseRunner):
             self.build_file.run_method(config.postbuild)
         elif self.build_file.postbuild_exists(target_name):
             self.build_file.run_postbuild(target_name)
+        
+        self.built.append(target_name)
+        self.to_build = [tb for tb in self.to_build if tb != target_name]
         
         print('Successfully built %s' % target_name)
         

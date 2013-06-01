@@ -87,6 +87,9 @@ def main():
 					runner.run_all()
 				else:
 					runner.run(args.targets)
+			except runners.RunnerException as e:
+				print(e)
+				ret = 1
 			except Exception as e:
 				print('An error occurred while building your project, see above for details.')
 				print(e)
