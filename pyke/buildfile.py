@@ -107,13 +107,16 @@ class PythonFileWrapper(FileWrapperBase):
 	
 	# Utility Functions
 	def method_exists(self, method_name):
-		return method_name in self.methods
+		return inspect.isroutine(method_name) or method_name in self.methods
 	
 	def run_method(self, method_name):
-		method = getattr(self.module, method_name)
-		
-		if method != None:
-			return method()
+		if inspect.isroutine(method_name):
+			method_name()
+		else:
+			method = getattr(self.module, method_name)
+			
+			if method != None:
+				return method()
 
 def load(filepath):
 	if not os.path.exists(filepath):
