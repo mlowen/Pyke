@@ -2,13 +2,14 @@ import os
 import sys
 import argparse
 
-from pyke import runners
+from . import compilers
+from . import meta
 
 from .target import TargetWrapper
 from .file import File
 
 # Meta Information
-__version__ = '0.5.0-beta'
+__version__ = '0.5.1-beta'
 __name__ = 'Pyke'
 __description__ = 'Build system for the GCC C++ compiler.'
 __author__ = 'Mike Lowen'
@@ -20,6 +21,12 @@ __license__ = 'MIT'
 
 DEFAULT_TARGET = 'default'
 DEFAULT_FILE_NAME = 'build.pyke'
+
+class PykeException(BaseException):
+	def __init__(self, message):
+		BaseException.__init__(message)
+
+		self.message = message
 
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
@@ -84,33 +91,33 @@ def main():
 			for t in build_file:
 				print(t)
 		else:
-			base_path = os.path.dirname(build_file_path)
-			
-			os.chdir(base_path)
-			
-			runner = runners.factory(args.action, build_file, base_path)
+			os.chdir(os.path.dirname(build_file_path))
+
 			ret = 0
 			
 			targets = build_file.targets() if args.all_targets else args.targets
 
-			try:
-				if args.action == Actions.Clean:
-					for t in targets: build_file[t].clean()
-				elif args.action == Actions.Rebuild:
-					for t in targets: build_file[t].rebuild()
-				elif args.action == Actions.GenerateDependencies:
-					for t in targets: build_file[t].generate_dependencies()
-				else:
-					for t in targets: build_file[t].build()
-			except runners.RunnerException as e:
+			#try:
+			if args.action == Actions.Clean:
+				for t in targets: build_file[t].clean()
+			elif args.action == Actions.Rebuild:
+				for t in targets: build_file[t].rebuild()
+			elif args.action == Actions.GenerateDependencies:
+				for t in targets: build_file[t].generate_dependencies()
+			else:
+				built = []
+
+				for t in targets: 
+					built = build_file[t].build(built = built)
+			'''
+			except PykeException as e:
 				print(e)
 				ret = 1
 			except Exception as e:
 				print('An error occurred while building your project, see above for details.')
 				print(e)
 				ret = 1
-			
-			runner.write_meta_data()
+			'''
 			sys.exit(ret)
 
 if __name__ == '__main__':

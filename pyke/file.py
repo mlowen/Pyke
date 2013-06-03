@@ -1,12 +1,12 @@
 import imp
-import os
 import inspect
-import json
+import os
 import sys
 
 import pyke
 
 from pyke import target
+from pyke import meta
 
 class File(dict):
 	def __init__(self, path):
@@ -31,8 +31,18 @@ class File(dict):
 				self[name] = item
 
 		sys.dont_write_bytecode = original_value
-	
+
+		self.path = os.path.join(os.path.dirname(path), '.pyke')
+
+		if not os.path.exists(self.path):
+			os.mkdir(self.path)
+
+		self.meta_data = meta.MetaFile(os.path.join(self.path, 'pyke.json'))
+
 	def __getitem__(self, key):
+		if key not in self:
+			raise pyke.PykeException('No target exists with name %s.' % t)
+
 		t = dict.__getitem__(self, key)
 
 		return target.Target(key, t.fn(), self)

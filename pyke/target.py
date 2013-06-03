@@ -1,4 +1,9 @@
+import inspect
 import os
+import pyke
+
+from fnmatch import fnmatchcase
+from pyke import compilers
 
 _defaults = {
 	'source_paths': os.getcwd(),
@@ -34,12 +39,49 @@ class Data:
 
 class Target:
 	def __init__(self, name, data, fp):
-		self._file = fp
-		self._name = name
+		self.name = name
+		self._file = fp		
 		self._data = Data(data)
 
-	def build(self, to_build = [], built = []):
-		print('Building %s' % self._name)
+	def build(self, pending = [], built = []):
+		# Do dependency stuff
+		pending.append(self.name)
+
+		if self._data.dependencies is not None:
+			targets = [d for d in self._data.dependencies if d not in built]
+			
+			for t in targets:
+				if t in self.to_build:
+					raise pyke.PykeException('Circular dependency has been detected for target %s.' % t)
+				
+				built = self._file[t].build(pending, built)
+
+		print('Starting build: %s' % self.name)
+
+		self._file.meta_data.set_target(self.name)
+		self.prebuild()
+
+		if self._data.is_phoney and self._data.run is not None:
+			self._data.run()
+		elif not self._data.is_phoney:
+			# Setup
+			compiler = compilers.factory(self._data.compiler, self._data.output_type)
+			compiler.set_object_directory(os.path.join(self._file.path, self.name))
+			
+			# Compile
+			object_files = self._compile(compiler)
+			
+			# Link
+			self._link(compiler, object_files)
+
+		self.postbuild()
+
+		built.append(self.name)
+		pending = [t for t in pending if t != self.name]
+		
+		print('Successfully built %s' % self.name)
+
+		return built
 
 	def clean(self):
 		print('Cleaning %s' % self._name)
@@ -48,4 +90,64 @@ class Target:
 		self.clean()
 		self.build()
 
+	def prebuild(self):
+		if self._data.prebuild is not None:
+			self._data.prebuild()
+		else:
+			name = 'pre_%s' % self.name
 
+			if any(name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
+				method = getattr(self._file.module, 'pre_%s' % self.name)
+				method()
+
+	def postbuild(self):
+		if self._data.postbuild is not None:
+			self._data.postbuild()
+		else:
+			name = 'post_%s' % self.name
+			
+			if any(name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
+				method = getattr(self._file.module, 'pre_%s' % self.name)
+				method()
+
+	# Private methods
+
+	def _compile(self, compiler):
+		source_patterns = self._data.source_patterns
+		
+		if source_patterns is None:
+			source_patterns = compiler.get_source_patterns()
+		
+		source_files = self._get_source_files(self._data.source_paths, source_patterns)
+		object_files = []
+		
+		for f in source_files:
+			object_file = compiler.get_object_file_name(f)
+			
+			if self._file.meta_data.has_file_changed(f) or not os.path.exists(object_file):
+				print('Compiling %s' % f)
+				compiler.compile(f, self._file.compiler_flags)
+			else:
+				print('%s has not changed, will not compile.' % f)
+			
+			object_files.append(object_file)
+		
+		return object_files
+
+	def _link(self, compiler, object_files):
+		output_name = compiler.get_output_name(self._data.output_name)
+		
+		print('Linking %s' % output_name)
+		
+		if not os.path.exists(self._data.output_path):
+			os.makedirs(self._data.output_path)
+					
+		compiler.link(os.path.join(self._data.output_path, output_name), object_files, self._data.linker_flags)
+
+	def _get_source_files(self, paths, patterns):
+		files = [ f for f in paths if os.path.exists(f) and os.path.isfile(f) and any(fnmatchcase(f, p) for p in patterns) ]
+		
+		for directory in [ d for d in paths if os.path.exists(d) and os.path.isdir(d) ]:
+			files += self._get_source_files([ os.path.join(directory, child) for child in os.listdir(directory) ], patterns)
+		
+		return files
