@@ -1,4 +1,4 @@
-# Pyke
+# Pyke [![Project Status](http://githubkanban.herokuapp.com/images/mlowen_Pyke.png)](http://bit.ly/18OhrcL)
 Pyke is a python build tool which is designed to be simple to use and configure, which also allows you to use the full power of python in your build scripts.
 
 ## Installation
