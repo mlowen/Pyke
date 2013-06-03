@@ -19,7 +19,11 @@ _defaults = {
 	'dependencies': None
 }
 
-class Config:
+class TargetWrapper:
+	def __init__(self, fn):
+		self.fn = fn
+
+class Data:
 	def __init__(self, data = None):
 		self._load_data(_defaults)
 		self._load_data(data)
@@ -27,3 +31,21 @@ class Config:
 	def _load_data(self, data):
 		for key in data:
 			self.__dict__[key] = data[key]
+
+class Target:
+	def __init__(self, name, data, fp):
+		self._file = fp
+		self._name = name
+		self._data = Data(data)
+
+	def build(self, to_build = [], built = []):
+		print('Building %s' % self._name)
+
+	def clean(self):
+		print('Cleaning %s' % self._name)
+
+	def rebuild(self):
+		self.clean()
+		self.build()
+
+
