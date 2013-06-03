@@ -11,7 +11,7 @@ class CleanRunner(BaseRunner):
     def run_target(self, target_name):
         print('Starting clean: %s' % target_name)
         
-        if not self.build_file.target_exists(target_name):
+        if target_name not in self.build_file:
             raise Exception('Target %s does not exist.' % target_name)
         
         # Delete pyke generated  intermediate files
@@ -21,7 +21,7 @@ class CleanRunner(BaseRunner):
         if(os.path.exists(obj_dir)):
             shutil.rmtree(obj_dir)
         
-        config = self.build_file.run_target(target_name)
+        config = self.build_file[target_name]
         compiler = compilers.factory(config.compiler, config.output_type)
         
         # Check if the build file has a custom clean available.
