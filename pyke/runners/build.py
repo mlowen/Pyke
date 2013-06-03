@@ -12,10 +12,10 @@ class BuildRunner(BaseRunner):
         self.built = []
         
     def run_target(self, target_name):
-        if not self.build_file.target_exists(target_name):
+        if target_name not in self.build_file:
             raise Exception('Target %s does not exist.' % target_name)
                 
-        config = self.build_file.run_target(target_name)
+        config = self.build_file[target_name]
         
         self.to_build.append(target_name)
         
