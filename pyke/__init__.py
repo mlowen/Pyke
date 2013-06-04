@@ -24,7 +24,7 @@ DEFAULT_FILE_NAME = 'build.pyke'
 
 class PykeException(BaseException):
 	def __init__(self, message):
-		BaseException.__init__(message)
+		BaseException.__init__(self, message)
 
 		self.message = message
 

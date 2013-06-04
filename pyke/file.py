@@ -41,7 +41,7 @@ class File(dict):
 
 	def __getitem__(self, key):
 		if key not in self:
-			raise pyke.PykeException('No target exists with name %s.' % t)
+			raise pyke.PykeException('No target exists with name %s.' % key)
 
 		t = dict.__getitem__(self, key)
 
