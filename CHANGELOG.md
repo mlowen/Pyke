@@ -1,5 +1,10 @@
 # Change Log
 
+## vNext
+
+* Added ability to populate the fields prebuild, postbuild & clean with methods instead of strings.
+* Functions must now be decorated with `@target` to be considered as targets.
+
 ## 0.5.0 (2013-06-01)
 
 * Implemented target dependencies.
