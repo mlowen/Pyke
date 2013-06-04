@@ -139,6 +139,25 @@ class Target:
 				method = getattr(self._file.module, name)
 				method()
 
+	def generate_dependencies(self):
+		print('Generating file dependencies for %s' % self.name)
+		
+		self._file.meta_data.set_target(self.name)
+		compiler = compilers.factory(self._data.compiler, self._data.output_type)
+		
+		source_paths = self._data.source_paths
+		source_patterns = self._data.source_patterns
+		
+		if source_patterns is None:
+			source_patterns = compiler.get_source_patterns()
+		
+		source_files = self._get_source_files(source_paths, source_patterns)
+		
+		for f in source_files:
+			self._file.meta_data.set_file_dependencies(f, compiler.get_file_dependencies(f))
+		
+		print('Successfully generated file dependencies for %s' % self.name)
+
 	# Private methods
 
 	def _compile(self, compiler):
