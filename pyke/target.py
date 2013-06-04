@@ -45,14 +45,13 @@ class Target:
 		self._data = Data(data)
 
 	def build(self, pending = [], built = []):
-		# Do dependency stuff
 		pending.append(self.name)
 
 		if self._data.dependencies is not None:
 			targets = [d for d in self._data.dependencies if d not in built]
 			
 			for t in targets:
-				if t in self.to_build:
+				if t in pending:
 					raise pyke.PykeException('Circular dependency has been detected for target %s.' % t)
 				
 				built = self._file[t].build(pending, built)

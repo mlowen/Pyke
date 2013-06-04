@@ -1,7 +1,7 @@
 import re
 import pyke
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
 	name = pyke.__name__,
@@ -21,7 +21,7 @@ setup(
 	author_email = pyke.__author_email__,
 	url = pyke.__homepage__,
 	license = pyke.__license__,
-	packages = [ 'pyke', 'pyke.compilers', 'pyke.runners' ],
+	packages = find_packages(),
 	entry_points = { 'console_scripts': [ 'pyke = pyke:main' ]},
 	zip_safe = False
 )
