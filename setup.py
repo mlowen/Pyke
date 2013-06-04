@@ -22,6 +22,6 @@ setup(
 	url = pyke.__homepage__,
 	license = pyke.__license__,
 	packages = find_packages(),
-	entry_points = { 'console_scripts': [ 'pyke = pyke:main' ]},
+	entry_points = { 'console_scripts': [ 'pyke = pyke.cli:main' ]},
 	zip_safe = False
 )

@@ -12,4 +12,4 @@ import pyke
 if __name__ == '__main__':
 	print('[ WARNING: Running in test script ]')
 	
-	pyke.main()
+	pyke.cli.main()
