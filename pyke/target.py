@@ -1,6 +1,7 @@
 import inspect
 import os
 import pyke
+import shutil
 
 from fnmatch import fnmatchcase
 from pyke import compilers
@@ -84,7 +85,35 @@ class Target:
 		return built
 
 	def clean(self):
-		print('Cleaning %s' % self._name)
+		print('Starting clean: %s' % self.name)
+				
+		# Delete pyke generated  intermediate files
+		self._file.meta_data.delete_target(self.name)
+		obj_dir = os.path.join(self._file.path, self.name)
+		
+		if(os.path.exists(obj_dir)):
+			shutil.rmtree(obj_dir)
+
+		compiler = compilers.factory(self._data.compiler, self._data.output_type)
+		clean_name = 'clean_%s' % self.name
+
+		# Check if the build file has a custom clean available.
+		if self._data.clean is not None:
+			self._data.clean()
+		elif any(clean_name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
+			method = getattr(self._file.module, clean_name)
+			method()
+		else:
+			if os.path.exists(self._data.output_path) and not os.getcwd() == self._data.output_path:
+				shutil.rmtree(self._data.output_path)
+			else:
+				output_type = self._data.output_type
+				output_name = compiler.get_output_name(self._data.output_name)
+				
+				if os.path.exists(output_name):
+					os.remove(output_name)
+					
+		print('Successfully cleaned %s' % self.name)
 
 	def rebuild(self):
 		self.clean()
@@ -97,7 +126,7 @@ class Target:
 			name = 'pre_%s' % self.name
 
 			if any(name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
-				method = getattr(self._file.module, 'pre_%s' % self.name)
+				method = getattr(self._file.module, name)
 				method()
 
 	def postbuild(self):
@@ -107,7 +136,7 @@ class Target:
 			name = 'post_%s' % self.name
 			
 			if any(name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
-				method = getattr(self._file.module, 'pre_%s' % self.name)
+				method = getattr(self._file.module, name)
 				method()
 
 	# Private methods
@@ -126,7 +155,7 @@ class Target:
 			
 			if self._file.meta_data.has_file_changed(f) or not os.path.exists(object_file):
 				print('Compiling %s' % f)
-				compiler.compile(f, self._file.compiler_flags)
+				compiler.compile(f, self._data.compiler_flags)
 			else:
 				print('%s has not changed, will not compile.' % f)
 			
