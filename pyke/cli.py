@@ -88,4 +88,5 @@ def main():
 				print(e)
 				ret = 1
 			
+			build_file.meta.write()
 			sys.exit(ret)
