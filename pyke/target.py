@@ -192,9 +192,10 @@ class Target:
 		compiler.link(os.path.join(self._data.output_path, output_name), object_files, self._data.linker_flags)
 
 	def _get_source_files(self, paths, patterns):
-		files = [ f for f in paths if os.path.exists(f) and os.path.isfile(f) and any(fnmatchcase(f, p) for p in patterns) ]
-		
-		for directory in [ d for d in paths if os.path.exists(d) and os.path.isdir(d) ]:
-			files += self._get_source_files([ os.path.join(directory, child) for child in os.listdir(directory) ], patterns)
-		
-		return files
+		source_files = []
+
+		for path in paths:
+			for root, directories, files in os.walk(path):
+				source_files += [os.path.join(root, f) for f in files if any(fnmatchcase(f, p) for p in patterns)]
+
+		return source_files
