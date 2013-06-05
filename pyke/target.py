@@ -33,6 +33,9 @@ class Target:
 		self._load_data(_defaults)
 		self._load_data(data)
 
+		if not self.is_phoney:
+			self._compiler = compilers.factory(self.compiler, self.output_type)
+
 	def build(self, pending = [], built = []):
 		pending.append(self.name)
 
@@ -54,14 +57,13 @@ class Target:
 			self.run()
 		elif not self.is_phoney:
 			# Setup
-			compiler = compilers.factory(self.compiler, self.output_type)
-			compiler.set_object_directory(os.path.join(self._file.path, self.name))
+			self._compiler.set_object_directory(os.path.join(self._file.path, self.name))
 			
 			# Compile
-			object_files = self._compile(compiler)
+			object_files = self._compile()
 			
 			# Link
-			self._link(compiler, object_files)
+			self._link(object_files)
 
 		self.postbuild()
 
@@ -82,7 +84,9 @@ class Target:
 		if(os.path.exists(obj_dir)):
 			shutil.rmtree(obj_dir)
 
-		compiler = compilers.factory(self.compiler, self.output_type)
+		if self.is_phoney:
+			return
+
 		clean_name = 'clean_%s' % self.name
 
 		if any(clean_name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
@@ -93,7 +97,7 @@ class Target:
 				shutil.rmtree(self.output_path)
 			else:
 				output_type = self.output_type
-				output_name = compiler.get_output_name(self.output_name)
+				output_name = self._compiler.get_output_name(self.output_name)
 				
 				if os.path.exists(output_name):
 					os.remove(output_name)
@@ -122,38 +126,37 @@ class Target:
 		print('Generating file dependencies for %s' % self.name)
 		
 		self._file.meta_data.set_target(self.name)
-		compiler = compilers.factory(self.compiler, self.output_type)
 		
 		source_paths = self.source_paths
 		source_patterns = self.source_patterns
 		
 		if source_patterns is None:
-			source_patterns = compiler.get_source_patterns()
+			source_patterns = self._compiler.get_source_patterns()
 		
 		source_files = self._get_source_files(source_paths, source_patterns)
 		
 		for f in source_files:
-			self._file.meta_data.set_file_dependencies(f, compiler.get_file_dependencies(f))
+			self._file.meta_data.set_file_dependencies(f, self._compiler.get_file_dependencies(f))
 		
 		print('Successfully generated file dependencies for %s' % self.name)
 
 	# Private methods
 
-	def _compile(self, compiler):
+	def _compile(self):
 		source_patterns = self.source_patterns
 		
 		if source_patterns is None:
-			source_patterns = compiler.get_source_patterns()
+			source_patterns = self._compiler.get_source_patterns()
 		
 		source_files = self._get_source_files(self.source_paths, source_patterns)
 		object_files = []
 		
 		for f in source_files:
-			object_file = compiler.get_object_file_name(f)
+			object_file = self._compiler.get_object_file_name(f)
 			
 			if self._file.meta_data.has_file_changed(f) or not os.path.exists(object_file):
 				print('Compiling %s' % f)
-				compiler.compile(f, self.compiler_flags)
+				self._compiler.compile(f, self.compiler_flags)
 			else:
 				print('%s has not changed, will not compile.' % f)
 			
@@ -161,15 +164,15 @@ class Target:
 		
 		return object_files
 
-	def _link(self, compiler, object_files):
-		output_name = compiler.get_output_name(self.output_name)
+	def _link(self, object_files):
+		output_name = self._compiler.get_output_name(self.output_name)
 		
 		print('Linking %s' % output_name)
 		
 		if not os.path.exists(self.output_path):
 			os.makedirs(self.output_path)
 					
-		compiler.link(os.path.join(self.output_path, output_name), object_files, self.linker_flags)
+		self._compiler.link(os.path.join(self.output_path, output_name), object_files, self.linker_flags)
 
 	def _load_data(self, data):
 		for key in data:
