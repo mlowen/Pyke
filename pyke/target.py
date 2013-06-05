@@ -127,31 +127,29 @@ class Target:
 		
 		self._file.meta_data.set_target(self.name)
 		
-		source_paths = self.source_paths
-		source_patterns = self.source_patterns
-		
-		if source_patterns is None:
-			source_patterns = self._compiler.get_source_patterns()
-		
-		source_files = self._get_source_files(source_paths, source_patterns)
-		
-		for f in source_files:
+		for f in self.get_source_files():
 			self._file.meta_data.set_file_dependencies(f, self._compiler.get_file_dependencies(f))
 		
 		print('Successfully generated file dependencies for %s' % self.name)
 
+	def get_source_files(self):
+		patterns = self.source_patterns
+		
+		if patterns is None:
+			patterns = self._compiler.get_source_patterns()
+
+		for path in self.source_paths:
+			for root, directories, files in os.walk(path):
+				source_files += [os.path.join(root, f) for f in files if any(fnmatchcase(f, p) for p in patterns)]
+
+		return source_files
+
 	# Private methods
 
 	def _compile(self):
-		source_patterns = self.source_patterns
-		
-		if source_patterns is None:
-			source_patterns = self._compiler.get_source_patterns()
-		
-		source_files = self._get_source_files(self.source_paths, source_patterns)
 		object_files = []
 		
-		for f in source_files:
+		for f in self.get_source_files():
 			object_file = self._compiler.get_object_file_name(f)
 			
 			if self._file.meta_data.has_file_changed(f) or not os.path.exists(object_file):
@@ -177,12 +175,3 @@ class Target:
 	def _load_data(self, data):
 		for key in data:
 			self.__dict__[key] = data[key]
-
-	def _get_source_files(self, paths, patterns):
-		source_files = []
-
-		for path in paths:
-			for root, directories, files in os.walk(path):
-				source_files += [os.path.join(root, f) for f in files if any(fnmatchcase(f, p) for p in patterns)]
-
-		return source_files
