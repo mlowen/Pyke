@@ -17,10 +17,6 @@ _defaults = {
 	'compiler_flags': [],
 	'linker_flags': [],
 	
-	'prebuild': None,
-	'postbuild': None,
-	'clean': None,
-	
 	'is_phoney': False,
 	'dependencies': None
 }
@@ -29,26 +25,19 @@ class TargetWrapper:
 	def __init__(self, fn):
 		self.fn = fn
 
-class Data:
-	def __init__(self, data = None):
-		self._load_data(_defaults)
-		self._load_data(data)
-	
-	def _load_data(self, data):
-		for key in data:
-			self.__dict__[key] = data[key]
-
 class Target:
 	def __init__(self, name, data, fp):
 		self.name = name
-		self._file = fp		
-		self._data = Data(data)
+		self._file = fp
+
+		self._load_data(_defaults)
+		self._load_data(data)
 
 	def build(self, pending = [], built = []):
 		pending.append(self.name)
 
-		if self._data.dependencies is not None:
-			targets = [d for d in self._data.dependencies if d not in built]
+		if self.dependencies is not None:
+			targets = [d for d in self.dependencies if d not in built]
 			
 			for t in targets:
 				if t in pending:
@@ -61,11 +50,11 @@ class Target:
 		self._file.meta_data.set_target(self.name)
 		self.prebuild()
 
-		if self._data.is_phoney and self._data.run is not None:
-			self._data.run()
-		elif not self._data.is_phoney:
+		if self.is_phoney and self.run is not None:
+			self.run()
+		elif not self.is_phoney:
 			# Setup
-			compiler = compilers.factory(self._data.compiler, self._data.output_type)
+			compiler = compilers.factory(self.compiler, self.output_type)
 			compiler.set_object_directory(os.path.join(self._file.path, self.name))
 			
 			# Compile
@@ -93,21 +82,18 @@ class Target:
 		if(os.path.exists(obj_dir)):
 			shutil.rmtree(obj_dir)
 
-		compiler = compilers.factory(self._data.compiler, self._data.output_type)
+		compiler = compilers.factory(self.compiler, self.output_type)
 		clean_name = 'clean_%s' % self.name
 
-		# Check if the build file has a custom clean available.
-		if self._data.clean is not None:
-			self._data.clean()
-		elif any(clean_name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
+		if any(clean_name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
 			method = getattr(self._file.module, clean_name)
 			method()
 		else:
-			if os.path.exists(self._data.output_path) and not os.getcwd() == self._data.output_path:
-				shutil.rmtree(self._data.output_path)
+			if os.path.exists(self.output_path) and not os.getcwd() == self.output_path:
+				shutil.rmtree(self.output_path)
 			else:
-				output_type = self._data.output_type
-				output_name = compiler.get_output_name(self._data.output_name)
+				output_type = self.output_type
+				output_name = compiler.get_output_name(self.output_name)
 				
 				if os.path.exists(output_name):
 					os.remove(output_name)
@@ -119,33 +105,27 @@ class Target:
 		self.build()
 
 	def prebuild(self):
-		if self._data.prebuild is not None:
-			self._data.prebuild()
-		else:
-			name = 'pre_%s' % self.name
+		name = 'pre_%s' % self.name
 
-			if any(name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
-				method = getattr(self._file.module, name)
-				method()
+		if any(name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
+			method = getattr(self._file.module, name)
+			method()
 
 	def postbuild(self):
-		if self._data.postbuild is not None:
-			self._data.postbuild()
-		else:
-			name = 'post_%s' % self.name
-			
-			if any(name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
-				method = getattr(self._file.module, name)
-				method()
+		name = 'post_%s' % self.name
+		
+		if any(name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
+			method = getattr(self._file.module, name)
+			method()
 
 	def generate_dependencies(self):
 		print('Generating file dependencies for %s' % self.name)
 		
 		self._file.meta_data.set_target(self.name)
-		compiler = compilers.factory(self._data.compiler, self._data.output_type)
+		compiler = compilers.factory(self.compiler, self.output_type)
 		
-		source_paths = self._data.source_paths
-		source_patterns = self._data.source_patterns
+		source_paths = self.source_paths
+		source_patterns = self.source_patterns
 		
 		if source_patterns is None:
 			source_patterns = compiler.get_source_patterns()
@@ -160,12 +140,12 @@ class Target:
 	# Private methods
 
 	def _compile(self, compiler):
-		source_patterns = self._data.source_patterns
+		source_patterns = self.source_patterns
 		
 		if source_patterns is None:
 			source_patterns = compiler.get_source_patterns()
 		
-		source_files = self._get_source_files(self._data.source_paths, source_patterns)
+		source_files = self._get_source_files(self.source_paths, source_patterns)
 		object_files = []
 		
 		for f in source_files:
@@ -173,7 +153,7 @@ class Target:
 			
 			if self._file.meta_data.has_file_changed(f) or not os.path.exists(object_file):
 				print('Compiling %s' % f)
-				compiler.compile(f, self._data.compiler_flags)
+				compiler.compile(f, self.compiler_flags)
 			else:
 				print('%s has not changed, will not compile.' % f)
 			
@@ -182,14 +162,18 @@ class Target:
 		return object_files
 
 	def _link(self, compiler, object_files):
-		output_name = compiler.get_output_name(self._data.output_name)
+		output_name = compiler.get_output_name(self.output_name)
 		
 		print('Linking %s' % output_name)
 		
-		if not os.path.exists(self._data.output_path):
-			os.makedirs(self._data.output_path)
+		if not os.path.exists(self.output_path):
+			os.makedirs(self.output_path)
 					
-		compiler.link(os.path.join(self._data.output_path, output_name), object_files, self._data.linker_flags)
+		compiler.link(os.path.join(self.output_path, output_name), object_files, self.linker_flags)
+
+	def _load_data(self, data):
+		for key in data:
+			self.__dict__[key] = data[key]
 
 	def _get_source_files(self, paths, patterns):
 		source_files = []
