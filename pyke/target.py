@@ -29,6 +29,7 @@ class Target:
 	def __init__(self, name, data, fp):
 		self.name = name
 		self._file = fp
+		self._meta = fp.meta[name]
 
 		self._load_data(_defaults)
 		self._load_data(data)
@@ -50,7 +51,6 @@ class Target:
 
 		print('Starting build: %s' % self.name)
 
-		self._file.meta_data.set_target(self.name)
 		self.prebuild()
 
 		if self.is_phoney and self.run is not None:
@@ -78,7 +78,7 @@ class Target:
 		print('Starting clean: %s' % self.name)
 				
 		# Delete pyke generated  intermediate files
-		self._file.meta_data.delete_target(self.name)
+		del self._file.meta[self.name]
 		obj_dir = os.path.join(self._file.path, self.name)
 		
 		if(os.path.exists(obj_dir)):
@@ -124,11 +124,9 @@ class Target:
 
 	def generate_dependencies(self):
 		print('Generating file dependencies for %s' % self.name)
-		
-		self._file.meta_data.set_target(self.name)
-		
+
 		for f in self.get_source_files():
-			self._file.meta_data.set_file_dependencies(f, self._compiler.get_file_dependencies(f))
+			self._meta[f].set_dependencies(self._compiler.get_file_dependencies(f))
 		
 		print('Successfully generated file dependencies for %s' % self.name)
 
@@ -137,6 +135,8 @@ class Target:
 		
 		if patterns is None:
 			patterns = self._compiler.get_source_patterns()
+
+		source_files = []
 
 		for path in self.source_paths:
 			for root, directories, files in os.walk(path):
@@ -152,7 +152,7 @@ class Target:
 		for f in self.get_source_files():
 			object_file = self._compiler.get_object_file_name(f)
 			
-			if self._file.meta_data.has_file_changed(f) or not os.path.exists(object_file):
+			if self._meta[f].changed() or not os.path.exists(object_file):
 				print('Compiling %s' % f)
 				self._compiler.compile(f, self.compiler_flags)
 			else:

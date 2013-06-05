@@ -37,7 +37,7 @@ class File(dict):
 		if not os.path.exists(self.path):
 			os.mkdir(self.path)
 
-		self.meta_data = meta.MetaFile(os.path.join(self.path, 'pyke.json'))
+		self.meta = meta.File(os.path.join(self.path, 'pyke.json'))
 
 	def __getitem__(self, key):
 		if key not in self:
