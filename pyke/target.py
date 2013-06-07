@@ -78,7 +78,7 @@ class Target:
 		print('Starting clean: %s' % self.name)
 				
 		# Delete pyke generated  intermediate files
-		del self._file.meta[self.name]
+		self._meta.clean()
 		obj_dir = os.path.join(self._file.path, self.name)
 		
 		if(os.path.exists(obj_dir)):

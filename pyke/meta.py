@@ -19,6 +19,12 @@ class TargetFile:
 			'dependencies': self.dependencies
 		}
 
+	def clean(self):
+		self.hash = None
+
+		for dependency in self.dependencies:
+			self.dependencies[dependency] = None
+
 	def changed(self):
 		changed = False
 		
@@ -59,6 +65,10 @@ class Target(dict):
 			data[f] = self[f].raw()
 
 		return data
+
+	def clean(self):
+		for f in self:
+			self[f].clean()
 
 	def __getitem__(self, key):
 		if key not in self:
