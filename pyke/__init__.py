@@ -1,5 +1,5 @@
 from . import cli
-from . import compilers
+from . import builders
 from . import meta
 
 from .target import TargetWrapper

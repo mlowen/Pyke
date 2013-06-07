@@ -1,4 +1,4 @@
-from pyke.compilers import gplusplus
+from . import gplusplus
 
 def factory(compiler, output_type):
     if output_type not in [ 'executable', 'sharedlib', 'dynamiclib' ]:
