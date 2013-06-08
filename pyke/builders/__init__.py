@@ -22,6 +22,7 @@ class Factory:
 		self._builders = {}
 		
 		# Load the built-in builders
+		self._builders[gpp.NAME] = gpp.factory
 	
 	def get(self, name, output_type):
 		if name not in self._builders:
