@@ -1,4 +1,4 @@
-from . import gplusplus
+from . import gpp
 
 def factory(compiler, output_type):
     if output_type not in [ 'executable', 'sharedlib', 'dynamiclib' ]:
@@ -6,10 +6,10 @@ def factory(compiler, output_type):
     
     if compiler == 'g++':
         if output_type == 'executable':
-            return gplusplus.ExecutableCompiler()
+            return gpp.ExecutableCompiler()
         elif output_type == 'sharedlib':
-            return gplusplus.SharedLibraryCompiler()
+            return gpp.SharedLibraryCompiler()
         elif output_type == 'dynamiclib':
-            return gplusplus.DynamicLibraryCompiler()
+            return gpp.DynamicLibraryCompiler()
     
     raise Exception('Unknown compiler: %s' % compiler)
