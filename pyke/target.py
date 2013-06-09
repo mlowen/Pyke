@@ -35,7 +35,7 @@ class Target:
 		self._load_data(data)
 
 		if not self.is_phoney:
-			self._builder = builders.factory(self.compiler, self.output_type)
+			self._builder = self._file.builders.get(self.compiler, self.output_type)
 
 	def build(self, pending = [], built = []):
 		pending.append(self.name)
@@ -57,7 +57,7 @@ class Target:
 			self.run()
 		elif not self.is_phoney:
 			# Setup
-			self._builder.set_object_directory(os.path.join(self._file.path, self.name))
+			self._builder.object_directory(os.path.join(self._file.path, self.name))
 			
 			# Compile
 			object_files = self._compile()
@@ -97,7 +97,7 @@ class Target:
 				shutil.rmtree(self.output_path)
 			else:
 				output_type = self.output_type
-				output_name = self._builder.get_output_name(self.output_name)
+				output_name = self._builder.output_name(self.output_name)
 				
 				if os.path.exists(output_name):
 					os.remove(output_name)
@@ -126,7 +126,7 @@ class Target:
 		print('Generating file dependencies for %s' % self.name)
 
 		for f in self.get_source_files():
-			self._meta[f].set_dependencies(self._builder.get_file_dependencies(f))
+			self._meta[f].set_dependencies(self._builder.dependencies(f))
 		
 		print('Successfully generated file dependencies for %s' % self.name)
 
@@ -134,7 +134,7 @@ class Target:
 		patterns = self.source_patterns
 		
 		if patterns is None:
-			patterns = self._builder.get_source_patterns()
+			patterns = self._builder.patterns
 
 		source_files = []
 
@@ -150,7 +150,7 @@ class Target:
 		object_files = []
 		
 		for f in self.get_source_files():
-			object_file = self._builder.get_object_file_name(f)
+			object_file = self._builder.object_file_name(f)
 			
 			if self._meta[f].changed() or not os.path.exists(object_file):
 				print('Compiling %s' % f)
@@ -163,7 +163,7 @@ class Target:
 		return object_files
 
 	def _link(self, object_files):
-		output_name = self._builder.get_output_name(self.output_name)
+		output_name = self._builder.output_name(self.output_name)
 		
 		print('Linking %s' % output_name)
 		

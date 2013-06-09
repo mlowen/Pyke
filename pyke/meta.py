@@ -94,7 +94,7 @@ class File(dict):
 		for t in self:
 			data[t] = self[t].raw()
 
-		json.dump(data, open(self._path, 'w'))
+		json.dump(data, open(self._path, 'w'), indent = 4)
 
 	def __getitem__(self, key):
 		if key not in self:

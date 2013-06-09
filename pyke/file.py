@@ -7,6 +7,7 @@ import pyke
 
 from pyke import target
 from pyke import meta
+from pyke import builders
 
 class File(dict):
 	def __init__(self, path):
@@ -38,6 +39,7 @@ class File(dict):
 			os.mkdir(self.path)
 
 		self.meta = meta.File(os.path.join(self.path, 'pyke.json'))
+		self.builders = builders.Factory()
 
 	def __getitem__(self, key):
 		if key not in self:
