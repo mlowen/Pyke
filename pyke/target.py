@@ -4,7 +4,6 @@ import pyke
 import shutil
 
 from fnmatch import fnmatchcase
-from pyke import builders
 
 _defaults = {
 	'source_paths': os.getcwd(),
