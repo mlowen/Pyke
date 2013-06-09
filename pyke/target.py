@@ -17,7 +17,8 @@ _defaults = {
 	'linker_flags': [],
 	
 	'is_phoney': False,
-	'dependencies': None
+	'dependencies': None,
+	'builder': None
 }
 
 class TargetWrapper:
@@ -34,7 +35,7 @@ class Target:
 		self._load_data(data)
 
 		if not self.is_phoney:
-			self._builder = self._file.builders.get(self.compiler, self.output_type)
+			self._builder = self._file.builders.get(self.builder, self.output_type)
 			self._builder.object_directory = os.path.join(self._file.path, self.name)
 
 	def build(self, pending = [], built = []):
