@@ -5,7 +5,7 @@ import subprocess
 from platform import system
 from collections import deque
 
-NAME = 'g++'
+NAME = 'gcc'
 
 def factory(output_type):
 	if output_type == 'executable':
@@ -22,7 +22,7 @@ class BaseCompiler:
 		self._dependency_regex = re.compile(r'#include "([^"]+)"')
 
 		self.has_linker = True
-		self.patterns = [ '*.cc', '*.cpp', '*.cxx' ]
+		self.patterns = [ '*.c' ]
 		self.object_directory = ''
 	
 	def compile(self, file_name, flags):
@@ -32,7 +32,7 @@ class BaseCompiler:
 		if not os.path.exists(output_path):
 			os.makedirs(output_path)
 		
-		args = ['g++', '-c', file_name, '-o', output_file] + flags
+		args = ['gcc', '-c', file_name, '-o', output_file] + flags
 		subprocess.check_call(args, stderr=subprocess.STDOUT, shell = True)
 	
 	def object_file_name(self, file_name):
@@ -68,7 +68,7 @@ class ExecutableCompiler(BaseCompiler):
 		return base_name
 	
 	def link(self, executable_path, object_files, flags):
-		args = ['g++', '-o', executable_path] + object_files + flags
+		args = ['gcc', '-o', executable_path] + object_files + flags
 		
 		subprocess.check_call(args, stderr=subprocess.STDOUT, shell = True)
 
@@ -89,6 +89,6 @@ class DynamicLibraryCompiler(BaseCompiler):
 			return '%s.so' % base_name
 	
 	def link(self, executable_path, object_files, flags):
-		args = [ 'g++', '-shared', '-o', executable_path ] + object_files + flags
+		args = [ 'gcc', '-shared', '-o', executable_path ] + object_files + flags
 		
 		subprocess.check_call(args, stderr = subprocess.STDOUT, shell = True)

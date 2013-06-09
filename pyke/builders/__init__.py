@@ -1,5 +1,6 @@
 import pyke
 
+from . import gcc
 from . import gpp
 
 class Factory:
@@ -7,6 +8,7 @@ class Factory:
 		self._builders = {}
 		
 		# Load the built-in builders
+		self._builders[gcc.NAME] = gcc.factory
 		self._builders[gpp.NAME] = gpp.factory
 	
 	def get(self, name, output_type):
@@ -20,3 +22,6 @@ class Factory:
 			raise pyke.PykeException('No builder for %s, %s combo.' % (name, output_type))
 		
 		return builder
+
+	def list(self):
+		return [ k for k in self._builders ]
