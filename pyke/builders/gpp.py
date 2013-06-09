@@ -42,25 +42,21 @@ class BaseCompiler:
 		return os.path.join(output_path, '%s.o' % base_name)
 	
 	def dependencies(self, file_name):
-		fp = open(file_name, 'r')
-		parent_dir = os.path.dirname(file_name)
-		
-		results = self._dependency_regex.search(fp.read())
 		dependencies = []
 
-		if results is not None:
-			for header in [ os.path.normpath(os.path.join(parent_dir, f)) for f in results.groups() ]:
-				dependencies.append(header)
-				
-				hp = open(header, 'r')
-				
-				header_results = self._dependency_regex.search(hp.read())
-				
-				if header_results is not None:
-					header_parent = os.path.dirname(header)
-					dependencies.extend([ os.path.normpath(os.path.join(header_parent, h)) for h in header_results.groups() ])
-				
-				hp.close()
+		queue = deque([ file_name ])
+
+		while len(queue) > 0:
+			path = queue.popleft()
+			parent_dir = os.path.dirname(path)
+			
+			results = self._dependency_regex.search(open(path, 'r').read())
+						
+			if results is not None:
+				for header in [ os.path.normpath(os.path.join(parent_dir, f)) for f in results.groups() ]:
+					if os.path.exists(header) and header not in dependencies:
+						dependencies.append(header)
+						queue.append(header)
 
 		return dependencies
 	
