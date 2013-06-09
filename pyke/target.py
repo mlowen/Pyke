@@ -75,7 +75,7 @@ class Target:
 	def clean(self):
 		if self.is_phoney:
 			return
-		
+
 		print('Starting clean: %s' % self.name)
 		
 		# Delete pyke generated  intermediate files
@@ -145,8 +145,9 @@ class Target:
 
 	def _compile(self):
 		object_files = []
-		
-		for f in self.get_source_files():
+		source_files = self.get_source_files()
+
+		for f in source_files:
 			object_file = self._builder.object_file_name(f)
 			
 			if self._meta[f].changed() or not os.path.exists(object_file):
@@ -157,6 +158,8 @@ class Target:
 			
 			object_files.append(object_file)
 		
+		self._meta.tidyup(source_files)
+
 		return object_files
 
 	def _link(self, object_files):

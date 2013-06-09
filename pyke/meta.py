@@ -47,8 +47,11 @@ class TargetFile:
 		return changed
 
 	def set_dependencies(self, dependencies):
-		for d in dependencies:
-			self.dependencies[d] = None
+		for dependency in [ d for d in dependencies if d not in self.dependencies ]:
+			self.dependencies[dependency] = None
+
+		for dependency in [d for d in self.dependencies if d not in dependencies]:
+			del self.dependencies[dependency]
 
 class Target(dict):
 	def __init__(self, fp, data = {}):
@@ -65,6 +68,10 @@ class Target(dict):
 			data[f] = self[f].raw()
 
 		return data
+
+	def tidyup(self, files):
+		for f in [tf for tf in self if tf not in files]:
+			del self[f]
 
 	def clean(self):
 		for f in self:
