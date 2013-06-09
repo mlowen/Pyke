@@ -42,12 +42,20 @@ def main():
 	
 	parser.add_argument('-r', '--rebuild', dest = 'action', action = 'store_const', const = REBUILD,
 		help = 'Runs a clean followed by a build on the specified targets.')
+
+	parser.add_argument('-b', '--builders', dest = 'list_builders', action = 'store_true',
+		help = 'List the available builders that can be used.')
 	
 	args = parser.parse_args()
 	
 	# Run the application
 	if args.display_version:
 		version()
+	elif args.list_builders:
+		builders = pyke.builders.Factory().list()
+
+		for b in builders:
+			print(b)
 	else:
 		build_file_path = None
 		
