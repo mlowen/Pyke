@@ -36,7 +36,7 @@ class Target:
 
 		if not self.is_phoney:
 			self._builder = self._file.builders.get(self.builder, self.output_type)
-			self._builder.object_directory = os.path.join(self._file.path, self.name)
+			self._builder.object_directory = os.path.join(self._file.meta_path, self.name)
 
 	def build(self, pending = [], built = []):
 		pending.append(self.name)

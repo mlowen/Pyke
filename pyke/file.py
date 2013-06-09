@@ -33,12 +33,13 @@ class File(dict):
 
 		sys.dont_write_bytecode = original_value
 
-		self.path = os.path.join(os.path.dirname(path), '.pyke')
+		self.path = os.path.dirname(path)
+		self.meta_path = os.path.join(self.path, '.pyke')
 
-		if not os.path.exists(self.path):
-			os.mkdir(self.path)
+		if not os.path.exists(self.meta_path):
+			os.mkdir(self.meta_path)
 
-		self.meta = meta.File(os.path.join(self.path, 'pyke.json'))
+		self.meta = meta.File(os.path.join(self.meta_path, 'pyke.json'))
 		self.builders = builders.Factory()
 
 	def __getitem__(self, key):
