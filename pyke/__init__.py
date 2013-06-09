@@ -8,7 +8,7 @@ from .file import File
 # Meta Information
 __version__ = '0.5.1-beta'
 __name__ = 'Pyke'
-__description__ = 'Build system for the GCC C++ compiler.'
+__description__ = 'A build system for C/C++ using the GCC.'
 __author__ = 'Mike Lowen'
 __author_email__ = 'mike@mlowen.com'
 __homepage__ = 'http://mlowen.com'
