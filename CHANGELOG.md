@@ -6,6 +6,8 @@
 * Functions must now be decorated with `@target` to be considered as targets.
 * When cleaning file dependencies are now retained.
 * Updated the dependency generation so it goes more than two levels deep.
+* Renamed the 'compiler' field in a build file to be 'builder'.
+* Added a tidy up function to the meta file to prevent the build-up of crud.
 
 ## 0.5.0 (2013-06-01)
 

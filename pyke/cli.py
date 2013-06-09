@@ -62,8 +62,6 @@ def main():
 			for t in build_file:
 				print(t)
 		else:
-			os.chdir(os.path.dirname(build_file_path))
-
 			ret = 0
 			
 			targets = build_file.targets() if args.all_targets else args.targets

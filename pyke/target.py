@@ -30,6 +30,7 @@ class Target:
 		self.name = name
 		self._file = fp
 		self._meta = fp.meta[name]
+		self._cwd = None
 
 		self._load_data(_defaults)
 		self._load_data(data)
@@ -39,6 +40,8 @@ class Target:
 			self._builder.object_directory = os.path.join(self._file.meta_path, self.name)
 
 	def build(self, pending = [], built = []):
+		self._setup()
+
 		pending.append(self.name)
 
 		if self.dependencies is not None:
@@ -70,11 +73,15 @@ class Target:
 		
 		print('Successfully built %s' % self.name)
 
+		self._reset()
+
 		return built
 
 	def clean(self):
 		if self.is_phoney:
 			return
+
+		self._setup()
 
 		print('Starting clean: %s' % self.name)
 		
@@ -99,6 +106,8 @@ class Target:
 				if os.path.exists(output_name):
 					os.remove(output_name)
 		
+		self._reset()
+
 		print('Successfully cleaned %s' % self.name)
 
 	def rebuild(self):
@@ -120,11 +129,18 @@ class Target:
 			method()
 
 	def generate_dependencies(self):
+		if self.is_phoney:
+			return
+
+		self._setup()
+
 		print('Generating file dependencies for %s' % self.name)
 
 		for f in self.get_source_files():
 			self._meta[f].set_dependencies(self._builder.dependencies(f))
 		
+		self._reset()
+
 		print('Successfully generated file dependencies for %s' % self.name)
 
 	def get_source_files(self):
@@ -142,6 +158,13 @@ class Target:
 		return source_files
 
 	# Private methods
+
+	def _setup(self):
+		self._cwd = os.getcwd()
+		os.chdir(self._file.path)
+
+	def _reset(self):
+		os.chdir(self._cwd)
 
 	def _compile(self):
 		object_files = []
