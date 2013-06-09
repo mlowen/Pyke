@@ -20,7 +20,7 @@ def factory(output_type):
 class BaseCompiler:
 	def __init__(self):
 		self._object_directory = ''
-		self._dependency_regex = re.compile('#include \"([^\"]+)\"')
+		self._dependency_regex = re.compile(r'#include "([^"]+)"')
 		self.has_linker = True
 		self.patterns = [ '*.c', '*.cpp', '*.cxx' ]
 	
