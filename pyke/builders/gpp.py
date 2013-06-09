@@ -19,10 +19,11 @@ def factory(output_type):
 
 class BaseCompiler:
 	def __init__(self):
-		self._object_directory = ''
 		self._dependency_regex = re.compile(r'#include "([^"]+)"')
+
 		self.has_linker = True
 		self.patterns = [ '*.c', '*.cpp', '*.cxx' ]
+		self.object_directory = ''
 	
 	def compile(self, file_name, flags):
 		output_file = self.object_file_name(file_name)
@@ -36,8 +37,7 @@ class BaseCompiler:
 	
 	def object_file_name(self, file_name):
 		base_name = os.path.splitext(os.path.basename(file_name))[0]
-		parent_dir = os.path.dirname(file_name)
-		output_path = os.path.join(self._object_directory, parent_dir)
+		output_path = os.path.join(self.object_directory, os.path.dirname(file_name))
 		
 		return os.path.join(output_path, '%s.o' % base_name)
 	
@@ -59,12 +59,6 @@ class BaseCompiler:
 						queue.append(header)
 
 		return dependencies
-	
-	def object_directory(self, obj_dir):
-		self._object_directory = obj_dir
-		
-		if not os.path.exists(self._object_directory):
-			os.makedirs(self._object_directory)
 
 class ExecutableCompiler(BaseCompiler):
 	def output_name(self, base_name):

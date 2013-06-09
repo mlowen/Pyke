@@ -36,6 +36,7 @@ class Target:
 
 		if not self.is_phoney:
 			self._builder = self._file.builders.get(self.compiler, self.output_type)
+			self._builder.object_directory = os.path.join(self._file.path, self.name)
 
 	def build(self, pending = [], built = []):
 		pending.append(self.name)
@@ -55,10 +56,7 @@ class Target:
 
 		if self.is_phoney and self.run is not None:
 			self.run()
-		elif not self.is_phoney:
-			# Setup
-			self._builder.object_directory(os.path.join(self._file.path, self.name))
-			
+		elif not self.is_phoney:			
 			# Compile
 			object_files = self._compile()
 			
@@ -75,17 +73,16 @@ class Target:
 		return built
 
 	def clean(self):
-		print('Starting clean: %s' % self.name)
-				
-		# Delete pyke generated  intermediate files
-		self._meta.clean()
-		obj_dir = os.path.join(self._file.path, self.name)
-		
-		if(os.path.exists(obj_dir)):
-			shutil.rmtree(obj_dir)
-
 		if self.is_phoney:
 			return
+		
+		print('Starting clean: %s' % self.name)
+		
+		# Delete pyke generated  intermediate files
+		self._meta.clean()
+
+		if self._builder is not None and os.path.exists(self._builder.object_directory):
+			shutil.rmtree(self._builder.object_directory)
 
 		clean_name = 'clean_%s' % self.name
 
@@ -101,7 +98,7 @@ class Target:
 				
 				if os.path.exists(output_name):
 					os.remove(output_name)
-					
+		
 		print('Successfully cleaned %s' % self.name)
 
 	def rebuild(self):
