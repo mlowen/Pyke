@@ -6,7 +6,7 @@ from .target import TargetWrapper
 from .file import File
 
 # Meta Information
-__version__ = '0.5.1-beta'
+__version__ = '0.5.2-beta'
 __name__ = 'Pyke'
 __description__ = 'A build system for C/C++ using the GCC.'
 __author__ = 'Mike Lowen'

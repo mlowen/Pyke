@@ -15,16 +15,16 @@ To install pyke you need to have a package that supplies easy\_install installed
 
 When running pyke all arguments are optional.
 
+* `-h, --help` show this help message and exit
+* `-t target [target ...], --targets target [target ...]` Targets to build, default target is 'default'
+* `-f file, --file file` The build file to load, default file name is 'build.pyke'
+* `-v, --version` Displays version information
+* `-l, --list` Lists all of the available targets in the build file.
 * `-a, --all` Run build/clean against all targets in the build file.
 * `-c, --clean` Remove all build artifacts generated when the target is built.
-* `-d, --dependencies` Generates and stores the dependencies for the source files in the target.
-* `-f file, --file file` The build file to load, default file name is 'build.pyke'
-* `-h, --help` show this help message and exit
-* `-j, --json` Force the file to load as json, when no file is specified then the default file name will be 'build.json'
-* `-l, --list` Lists all of the available targets in the build file.
+* `-d, --dependencies` Generate and store the dependencies for the source files in the target.
 * `-r, --rebuild` Runs a clean followed by a build on the specified targets.
-* `-t target [target ...], --target target [target ...]` Targets to build, default target is 'default'
-* `-v, --version` Displays version information.
+* `-b, --builders` List the available builders that can be used.
 
 ## Pyke File
 A pyke build file for all intents and purposes is a python script, anything you can do in a python script can be done in a pyke script.  A build (including pre & post build methods) are run from the directory that the build file is located in which will be referred to as the base path in this section.
@@ -62,16 +62,6 @@ There may be times when it is useful for multiple targets to share clean, pre &a
 * `postbuild` To overwrite the targets post-build function.
 * `clean` To overwrite the targets clean function.
 
-It is important to note that overwriting these function with functions that do not following the naming conventions will break the `--all` flag as it will treat those functions as targets.
-
-### JSON Build File
-You may for some reason not want to use all the python goodness in your build file, whatever your reason we have you covered.  Pyke offers the option to load the build file as JSON, this is done by one of two methods the first is specifying a file with the `.json` extension via the `--file` argument.  The second method to load a JSON file is to use the `--json` argument which will force pyke to use `build.json` as the default file name rather than `build.pyke`.
-
-The structure for a JSON build file is an object with the targets being the keys which represent objects which have keys which match the options described in the targets section above. It is important to note that when using a JSON based build file the following functionality is not available for use:
-
-* Pre &amp; Post build functionality.
-* Custom clean functionality.
-
 ### Example Build File
 
 Below is a trivial example of a imaginary project that links to two libraries.
@@ -94,19 +84,6 @@ def post_default():
 	print('Running the post-build')
 ```
 
-The closest equivalent JSON build file would be:
-
-```json
-{
-	"output_path": "bin",
-	"output_name": "example_name",
-	"source_path": [ "src" ],
-	"source_patterns": [ "*.cc", "*.cpp" ],
-	"compiler_flags": [ "-WALL", "-I", "..\\libs\\include" ],
-	"linker_flags": [ "L", "..\\libs", "-lexample-lib-a", "-lexample-lib-b" ]
-}
-```
-
 ## Dependencies
 
 Pyke currently has very naive dependency checking/generation, this is not done at compile-time and must be run separately.  The results from the dependency generation are stored in the .pyke file, an example of running the dependency generation is as follows:
@@ -115,16 +92,11 @@ Pyke currently has very naive dependency checking/generation, this is not done a
 
 For C++ projects the dependency generator will only go two layers deep, it will extract the local headers in the source files and any other local headers those first headers may contain.
 
-## Known Issues
-
-* Currently Pyke only uses the GNU C++ compiler, this is on the list to expand the options.
-* There is a bug in when getting all targets of a build file where if you import a function into the build file using the style `from x import y` Pyke will think that it is a valid target and when a build/clean all is run it will try and run that target.
-
 ## To Do
 
 The following is the list of features that are to be incorporated into Pyke and the approximate order in which they will be done.
 
-* Expand to other compilers - as a starting point C, Java and possibly C#.
+* Expand to other compilers.
 * Add a plugin system to allow others to write builders for compilers.
 * Add the ability to embed the compile and link steps in the build file itself.
 

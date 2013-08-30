@@ -18,7 +18,8 @@ _defaults = {
 	
 	'is_phoney': False,
 	'dependencies': None,
-	'builder': None
+	'builder': None,
+	'run': None
 }
 
 class TargetWrapper:
@@ -115,18 +116,10 @@ class Target:
 		self.build()
 
 	def prebuild(self):
-		name = 'pre_%s' % self.name
-
-		if any(name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
-			method = getattr(self._file.module, name)
-			method()
+		self._run_method('pre_%s' % self.name)
 
 	def postbuild(self):
-		name = 'post_%s' % self.name
-		
-		if any(name == m and inspect.isroutine(m) for m in inspect.getmembers(self._file.module)):
-			method = getattr(self._file.module, name)
-			method()
+		self._run_method('post_%s' % self.name)
 
 	def generate_dependencies(self):
 		if self.is_phoney:
@@ -198,3 +191,8 @@ class Target:
 	def _load_data(self, data):
 		for key in data:
 			self.__dict__[key] = data[key]
+
+	def _run_method(self, name):		
+		if any(name == m[0] and inspect.isroutine(m[1]) for m in inspect.getmembers(self._file.module)):
+			method = getattr(self._file.module, name)
+			method()
