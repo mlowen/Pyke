@@ -1,6 +1,8 @@
+import ctypes
 import imp
 import inspect
 import os
+import platform
 import sys
 
 import pyke
@@ -18,7 +20,7 @@ class File(dict):
 
 		name, extension = os.path.splitext(path)
 		
-		# Don't want to created the __pycache__ folder in the users project.
+		# Don't want to create the __pycache__ folder in the users project.
 		original_value = sys.dont_write_bytecode
 		sys.dont_write_bytecode = True
 		
@@ -38,6 +40,9 @@ class File(dict):
 
 		if not os.path.exists(self.meta_path):
 			os.mkdir(self.meta_path)
+
+			if platform.system().lower() == 'windows':
+				ctypes.windll.kernel32.SetFileAttributesW(self.meta_path, 2)
 
 		self.meta = meta.File(os.path.join(self.meta_path, 'pyke.json'))
 		self.builders = builders.Factory()
